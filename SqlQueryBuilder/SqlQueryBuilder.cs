@@ -1,4 +1,5 @@
 using SqlQueryBuilder.Generics;
+using SqlQueryBuilder.Resolvers;
 using System;
 using System.Linq.Expressions;
 
@@ -6,6 +7,10 @@ namespace SqlQueryBuilder
 {
 	public class SqlQueryBuilder : SqlQueryBuilderBase
 	{
+		public SqlQueryBuilder() : this(new DefaultTableNameResolver(), new DefaultColumnNameResolver())
+		{
+		}
+
 		public SqlQueryBuilder(ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver) : base(tableNameResolver, columnNameResolver)
 		{
 		}
