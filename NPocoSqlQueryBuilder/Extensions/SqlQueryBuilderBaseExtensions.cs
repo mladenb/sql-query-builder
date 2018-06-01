@@ -16,7 +16,7 @@ namespace NPocoSqlQueryBuilder.Extensions
 			var sqls = source
 				.Clauses
 				.ConsolidateWhereClauses()
-				.Select(c => SqlClauseExtensions.ToSql(c));
+				.Select(c => c.ToSql());
 
 			var result = Sql.Builder;
 
