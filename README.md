@@ -1,5 +1,5 @@
 # sql-query-builder
-A C# library which helps create customized and extensible sql queries more easily.
+A C# library which helps create customized and extensible LINQ-like sql queries more easily.
 
 It goes like this. First, we create an SqlQueryBuilder:
 ```csharp
