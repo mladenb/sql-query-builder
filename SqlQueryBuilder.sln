@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlQueryBuilder", "SqlQueryBuilder\SqlQueryBuilder.csproj", "{07965689-F6EB-46F3-8F02-911ED15A11A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefaultSqlQueryBuilder", "DefaultSqlQueryBuilder\DefaultSqlQueryBuilder.csproj", "{07965689-F6EB-46F3-8F02-911ED15A11A0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPocoSqlQueryBuilder", "NPocoSqlQueryBuilder\NPocoSqlQueryBuilder.csproj", "{71DB7E17-ACFC-4F0C-A61F-9FF9E3F8AEEC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlQueryBuilder.GenericsGenerator", "SqlQueryBuilder.GenericsGenerator\SqlQueryBuilder.GenericsGenerator.csproj", "{76B9EC61-968A-4A0D-868A-376ADBBC6E5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefaultSqlQueryBuilder.Tools.GenericsGenerator", "DefaultSqlQueryBuilder.Tools.GenericsGenerator\DefaultSqlQueryBuilder.Tools.GenericsGenerator.csproj", "{76B9EC61-968A-4A0D-868A-376ADBBC6E5E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPocoSqlQueryBuilder.Tests", "NPocoSqlQueryBuilder.Tests\NPocoSqlQueryBuilder.Tests.csproj", "{6E07BE6C-9FF1-42B9-B22D-105E105084FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlQueryBuilder.Tests", "SqlQueryBuilder.Tests\SqlQueryBuilder.Tests.csproj", "{DECB2AA8-514F-4AD8-90F3-F9606743983B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefaultSqlQueryBuilder.Tests", "DefaultSqlQueryBuilder.Tests\DefaultSqlQueryBuilder.Tests.csproj", "{DECB2AA8-514F-4AD8-90F3-F9606743983B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

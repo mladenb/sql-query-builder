@@ -1,27 +1,22 @@
-using DefaultSqlQueryBuilder;
+using DefaultSqlQueryBuilder.Extensions;
+using DefaultSqlQueryBuilder.Tests.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NPocoSqlQueryBuilder.Extensions;
-using NPocoSqlQueryBuilder.Tests.Extensions;
 using System.Linq;
 
-namespace NPocoSqlQueryBuilder.Tests
+namespace DefaultSqlQueryBuilder.Tests
 {
 	[TestClass]
-	public class NPocoSqlQueryBuilderTests : IMockDatabase
+	public class SqlQueryBuilderTests
 	{
-		private SqlQueryBuilder CreateNPocoSqlQueryBuilder()
+		private static SqlQueryBuilder CreateSqlQueryBuilder()
 		{
-			var dbMock = this.CreateDatabaseMock();
-			var tableNameResolver = new NPocoTableNameResolver(dbMock.Object);
-			var columnNameResolver = new NPocoColumnNameResolver(dbMock.Object);
-
-			return new SqlQueryBuilder(tableNameResolver, columnNameResolver);
+			return new SqlQueryBuilder();
 		}
 
 		[TestMethod]
 		public void SelectWithoutWhereTest()
 		{
-			var sql = CreateNPocoSqlQueryBuilder()
+			var sql = CreateSqlQueryBuilder()
 				.From<User>()
 				.SelectAll()
 				.ToSql();
@@ -32,8 +27,8 @@ namespace NPocoSqlQueryBuilder.Tests
 				"FROM [User]",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 0);
+			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
+			Assert.AreEqual(sql.Parameters.Length, 0);
 		}
 
 		[TestMethod]
@@ -41,7 +36,7 @@ namespace NPocoSqlQueryBuilder.Tests
 		{
 			const string name = "John";
 
-			var sql = CreateNPocoSqlQueryBuilder()
+			var sql = CreateSqlQueryBuilder()
 				.From<User>()
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.SelectAll()
@@ -54,9 +49,9 @@ namespace NPocoSqlQueryBuilder.Tests
 				"WHERE ([User].[Name] LIKE '%' + @0 + '%')",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 1);
-			Assert.AreEqual(sql.Arguments.First(), name);
+			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
+			Assert.AreEqual(sql.Parameters.Length, 1);
+			Assert.AreEqual(sql.Parameters.First(), name);
 		}
 
 		[TestMethod]
@@ -65,7 +60,7 @@ namespace NPocoSqlQueryBuilder.Tests
 			const string name = "John";
 			var validUserGroupIds = new[] { 1, 2, 3 };
 
-			var baseQuery = CreateNPocoSqlQueryBuilder()
+			var baseQuery = CreateSqlQueryBuilder()
 				.From<User>()
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.SelectAll();
@@ -84,12 +79,12 @@ namespace NPocoSqlQueryBuilder.Tests
 				"FROM [User]",
 				"INNER JOIN [Address] ON [User].[AddressId] = [Address].[Id]",
 				"INNER JOIN [UserGroup] ON [User].[UserGroupId] = [UserGroup].[Id]",
-				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1,@2,@3)))",
+				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1)))",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, joinSql.SQL);
-			Assert.AreEqual(joinSql.Arguments.Length, 4);
-			Assert.AreEqual(joinSql.Arguments.First(), name);
+			Assert.That.SqlsAreEqual(expectedResult, joinSql.Sql);
+			Assert.AreEqual(joinSql.Parameters.Length, 2);
+			Assert.AreEqual(joinSql.Parameters.First(), name);
 		}
 
 		[TestMethod]
@@ -98,7 +93,7 @@ namespace NPocoSqlQueryBuilder.Tests
 			const string name = "John";
 			var validUserGroupIds = new[] { 1, 2, 3 };
 
-			var baseQuery = CreateNPocoSqlQueryBuilder()
+			var baseQuery = CreateSqlQueryBuilder()
 				.From<User>()
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.SelectAll();
@@ -118,12 +113,12 @@ namespace NPocoSqlQueryBuilder.Tests
 				"FROM [User]",
 				"INNER JOIN [Address] ON [User].[AddressId] = [Address].[Id]",
 				"INNER JOIN [UserGroup] ON [User].[UserGroupId] = [UserGroup].[Id]",
-				"WHERE ((([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] = 1)) AND ([User].[UserGroupId] IN (@1,@2,@3)))",
+				"WHERE ((([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] = 1)) AND ([User].[UserGroupId] IN (@1)))",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, joinSql.SQL);
-			Assert.AreEqual(joinSql.Arguments.Length, 4);
-			Assert.AreEqual(joinSql.Arguments.First(), name);
+			Assert.That.SqlsAreEqual(expectedResult, joinSql.Sql);
+			Assert.AreEqual(joinSql.Parameters.Length, 2);
+			Assert.AreEqual(joinSql.Parameters.First(), name);
 		}
 
 		[TestMethod]
@@ -133,7 +128,7 @@ namespace NPocoSqlQueryBuilder.Tests
 			const int addressId = 1;
 			const string name = "John";
 
-			var sql = CreateNPocoSqlQueryBuilder()
+			var sql = CreateSqlQueryBuilder()
 				.Insert<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", age, addressId, name)
 				.ToSql();
 
@@ -143,11 +138,11 @@ namespace NPocoSqlQueryBuilder.Tests
 				"VALUES (@0, @1, @2)",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 3);
-			Assert.AreEqual(sql.Arguments[0], age);
-			Assert.AreEqual(sql.Arguments[1], addressId);
-			Assert.AreEqual(sql.Arguments[2], name);
+			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
+			Assert.AreEqual(sql.Parameters.Length, 3);
+			Assert.AreEqual(sql.Parameters[0], age);
+			Assert.AreEqual(sql.Parameters[1], addressId);
+			Assert.AreEqual(sql.Parameters[2], name);
 		}
 
 		[TestMethod]
@@ -157,7 +152,7 @@ namespace NPocoSqlQueryBuilder.Tests
 			const int addressId = 1;
 			const string name = "John";
 
-			var sql = CreateNPocoSqlQueryBuilder()
+			var sql = CreateSqlQueryBuilder()
 				.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1, {user.Name} = @2", age, addressId, name)
 				.ToSql();
 
@@ -167,11 +162,11 @@ namespace NPocoSqlQueryBuilder.Tests
 				"SET [User].[Age] = @0, [User].[AddressId] = @1, [User].[Name] = @2",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 3);
-			Assert.AreEqual(sql.Arguments[0], age);
-			Assert.AreEqual(sql.Arguments[1], addressId);
-			Assert.AreEqual(sql.Arguments[2], name);
+			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
+			Assert.AreEqual(sql.Parameters.Length, 3);
+			Assert.AreEqual(sql.Parameters[0], age);
+			Assert.AreEqual(sql.Parameters[1], addressId);
+			Assert.AreEqual(sql.Parameters[2], name);
 		}
 
 		[TestMethod]
@@ -181,7 +176,7 @@ namespace NPocoSqlQueryBuilder.Tests
 			const int addressId = 1;
 			const string name = "John";
 
-			var sql = CreateNPocoSqlQueryBuilder()
+			var sql = CreateSqlQueryBuilder()
 				.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1", age, addressId)
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.ToSql();
@@ -193,11 +188,11 @@ namespace NPocoSqlQueryBuilder.Tests
 				"WHERE ([User].[Name] LIKE '%' + @2 + '%')",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 3);
-			Assert.AreEqual(sql.Arguments[0], age);
-			Assert.AreEqual(sql.Arguments[1], addressId);
-			Assert.AreEqual(sql.Arguments[2], name);
+			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
+			Assert.AreEqual(sql.Parameters.Length, 3);
+			Assert.AreEqual(sql.Parameters[0], age);
+			Assert.AreEqual(sql.Parameters[1], addressId);
+			Assert.AreEqual(sql.Parameters[2], name);
 		}
 	}
 

@@ -1,13 +1,12 @@
-﻿using DefaultSqlQueryBuilder;
-using NPoco;
+﻿using DefaultSqlQueryBuilder.Clauses;
 using System;
 using System.Linq;
 
-namespace NPocoSqlQueryBuilder.Extensions
+namespace DefaultSqlQueryBuilder.Extensions
 {
 	public static class SqlQueryBuilderBaseExtensions
 	{
-		public static Sql ToSql(this SqlQueryBuilderBase source)
+		public static CustomSqlClause ToSql(this SqlQueryBuilderBase source)
 		{
 			if (source == null) throw new ArgumentNullException(nameof(source));
 
@@ -16,14 +15,7 @@ namespace NPocoSqlQueryBuilder.Extensions
 				.ConsolidateWhereClauses()
 				.Select(c => c.ToSql());
 
-			var result = Sql.Builder;
-
-			foreach (var sql in sqls)
-			{
-				result.Append(sql);
-			}
-
-			return result;
+			return sqls.Aggregate((current, sql) => current.Append(sql.Sql, sql.Parameters));
 		}
 	}
 }

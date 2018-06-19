@@ -1,5 +1,5 @@
-﻿using NPoco;
-using SqlQueryBuilder.Clauses;
+﻿using DefaultSqlQueryBuilder.Clauses;
+using NPoco;
 using System;
 using System.Collections.Generic;
 using System.Linq;

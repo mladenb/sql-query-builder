@@ -1,5 +1,5 @@
+using DefaultSqlQueryBuilder;
 using NPoco;
-using SqlQueryBuilder;
 using System;
 
 namespace NPocoSqlQueryBuilder
