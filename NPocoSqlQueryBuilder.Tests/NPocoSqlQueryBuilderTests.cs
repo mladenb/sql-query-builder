@@ -200,7 +200,7 @@ namespace NPocoSqlQueryBuilder.Tests
 		}
 	}
 
-	public class User
+	internal class User
 	{
 		public int Id { get; set; }
 		public int AddressId { get; set; }
@@ -209,12 +209,12 @@ namespace NPocoSqlQueryBuilder.Tests
 		public int Age { get; set; }
 	}
 
-	public class Address
+	internal class Address
 	{
 		public int Id { get; set; }
 	}
 
-	public class UserGroup
+	internal class UserGroup
 	{
 		public int Id { get; set; }
 	}

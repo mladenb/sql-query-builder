@@ -53,6 +53,37 @@ namespace NPocoSqlQueryBuilder.Extensions
 			throw new NotImplementedException();
 		}
 
+		public static IEnumerable<SqlClause> ConsolidateWhereClauses(this IEnumerable<SqlClause> sqlClauses)
+		{
+			if (sqlClauses == null) throw new ArgumentNullException(nameof(sqlClauses));
+
+			var clauses = sqlClauses.ToList();
+			var removableWhereClauses = clauses
+				.FindAll(clause => clause is WhereSqlClause)
+				.Cast<WhereSqlClause>()
+				.ToArray();
+
+			if (removableWhereClauses.Any())
+			{
+				clauses.RemoveAll(removableWhereClauses.Contains);
+				clauses.Add(removableWhereClauses.Aggregate(MergeWhere));
+			}
+
+			return clauses;
+		}
+
+		public static WhereSqlClause MergeWhere(this WhereSqlClause first, WhereSqlClause second)
+		{
+			if (first == null) throw new ArgumentNullException(nameof(first));
+			if (second == null) throw new ArgumentNullException(nameof(second));
+
+			var sql = Sql.Builder
+				.Append($"({first.WhereConditions})", first.Parameters)
+				.Append($" AND ({second.WhereConditions})", second.Parameters);
+
+			return new WhereSqlClause(sql.SQL, sql.Arguments);
+		}
+
 		/// <summary>
 		/// Given the list of parameters, returns the CSV list of SQL parameter placeholders (@0, @1, @2, ...)
 		/// </summary>
