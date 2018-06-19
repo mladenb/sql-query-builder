@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlQueryBuilder.GenericsGen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPocoSqlQueryBuilder.Tests", "NPocoSqlQueryBuilder.Tests\NPocoSqlQueryBuilder.Tests.csproj", "{6E07BE6C-9FF1-42B9-B22D-105E105084FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlQueryBuilder.Tests", "SqlQueryBuilder.Tests\SqlQueryBuilder.Tests.csproj", "{DECB2AA8-514F-4AD8-90F3-F9606743983B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{6E07BE6C-9FF1-42B9-B22D-105E105084FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E07BE6C-9FF1-42B9-B22D-105E105084FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E07BE6C-9FF1-42B9-B22D-105E105084FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DECB2AA8-514F-4AD8-90F3-F9606743983B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DECB2AA8-514F-4AD8-90F3-F9606743983B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DECB2AA8-514F-4AD8-90F3-F9606743983B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DECB2AA8-514F-4AD8-90F3-F9606743983B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
