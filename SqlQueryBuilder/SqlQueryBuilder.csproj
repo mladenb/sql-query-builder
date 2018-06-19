@@ -2,6 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageId>SqlQueryBuilder.Core</PackageId>
+    <Authors>Mladen B.</Authors>
+    <Company />
+    <Product>SqlQueryBuilder.Core</Product>
+    <Description>A C# library which helps create customized and extensible LINQ-like sql queries more easily.</Description>
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <Copyright>Copyright 2018</Copyright>
+    <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl-3.0.html</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/mladenb/sql-query-builder</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mladenb/sql-query-builder</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>sql query builder linq</PackageTags>
   </PropertyGroup>
 
 </Project>
