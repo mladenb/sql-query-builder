@@ -37,7 +37,7 @@ with SQL query parameters set to:
 ```sql
 @0 = "John"
 ```
-We made use of the [String.Format()](https://msdn.microsoft.com/en-us/library/system.string.format(v=vs.110).aspx) method in order to leverage the help of IntelliSense, to help use write queries more conveniently. In these examples, we used the "[string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated)" feature of the C# language, to make things even easier. The usage of generic methods, like `Where()`, also helps us expand the possible choices, every time we do an additional join, by providing us with the appropriate lambda parameters, according to the tables, used in those joins.
+We made use of the [String.Format()](https://msdn.microsoft.com/en-us/library/system.string.format(v=vs.110).aspx) method in order to leverage the help of IntelliSense, to help us write queries more conveniently. In these examples, we used the "[string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated)" feature of the C# language, to make things even easier. The usage of generic methods, like `Where()`, also helps us expand the possible choices, every time we do an additional join, by providing us with the appropriate lambda parameters, according to the tables, used in those joins.
 
 ## Mapping table/column names
 
