@@ -34,7 +34,7 @@ FROM [User]
 WHERE ([User].[Name] LIKE '%' + @0 + '%')
 ```
 with SQL query parameters set to:
-```
+```sql
 @0 = "John"
 ```
 We made use of the [String.Format()](https://msdn.microsoft.com/en-us/library/system.string.format(v=vs.110).aspx) method in order to leverage the help of IntelliSense, to help use write queries more conveniently. In these examples, we used the "[string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated)" feature of the C# language, to make things even easier. The usage of generic methods, like `Where()`, also helps us expand the possible choices, every time we do an additional join, by providing us with the appropriate lambda parameters, according to the tables, used in those joins.
@@ -134,7 +134,7 @@ FROM [User]
 WHERE ([User].[Name] LIKE '%' + @0 + '%')
 ```
 with SQL query parameters set to:
-```
+```sql
 @0 = "John"
 ```
 and the second SQL string, `joinSql`, which would look like:
@@ -146,7 +146,7 @@ INNER JOIN [UserGroup] ON [User].[UserGroupId] = [UserGroup].[Id]
 WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1,@2,@3)))
 ```
 with SQL query parameters set to:
-```
+```sql
 @0 = "John"
 @1 = 1
 @2 = 2
