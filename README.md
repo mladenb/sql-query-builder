@@ -56,8 +56,17 @@ query, we materialize it with `ToArray()`.
 
 The SQL query builder implements the similar behavior, helping us to create our
 queries in a similar fashion as LINQ queries, materializing them in the end as
-simple objects which consist of a string (the actual SQL command) and an object
-array (the SQL parameters).
+simple `SqlQuery` objects which consist of a string (the actual SQL command) and an object
+array (the SQL parameters):
+
+```csharp
+public class SqlQuery
+{
+	public string Command { get; }
+	public object[] Parameters { get; }
+}
+```
+
 That approach helps us create [parameterized SQL queries](https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqlcommand.parameters(v=vs.110).aspx)
 to avoid being a victim of an SQL injection attack.
 
