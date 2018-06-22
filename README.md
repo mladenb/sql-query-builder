@@ -73,7 +73,7 @@ which we'll use in all the following examples. For example, let's select everyth
 var sql = builder
 	.From<User>()
 	.SelectAll()
-	.ToSql();
+	.ToSqlQuery();
 ```
 This will produce an SQL command in the form of:
 ```sql
@@ -88,7 +88,7 @@ var sql = builder
 	.From<User>()
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 	.SelectAll()
-	.ToSql();
+	.ToSqlQuery();
 ```
 That will result with an SQL command like this:
 ```sql
@@ -120,8 +120,8 @@ var joinQuery = baseQuery
 	.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", userGroupIds)
 	.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-var baseSql = baseQuery.ToSql();
-var joinSql = joinQuery.ToSql();
+var baseSql = baseQuery.ToSqlQuery();
+var joinSql = joinQuery.ToSqlQuery();
 ```
 we would end up with 2 SQL strings. The first one being `baseSql`, which would look like this:
 ```sql
@@ -169,8 +169,8 @@ var joinQuery = baseQuery
 	.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", userGroupIds)
 	.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-var baseSql = baseQuery.ToSql();
-var joinSql = joinQuery.ToSql();
+var baseSql = baseQuery.ToSqlQuery();
+var joinSql = joinQuery.ToSqlQuery();
 ```
 which would result in 2 SQL strings. The first one, `baseSql`:
 ```sql
@@ -197,7 +197,7 @@ var name = "John";
 
 var sql = builder
 	.Insert<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", age, addressId, name)
-	.ToSql();
+	.ToSqlQuery();
 ```
 which would produce this as a result:
 ```sql
@@ -213,7 +213,7 @@ var name = "John";
 
 var sql = builder
 	.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1, {user.Name} = @2", age, addressId, name)
-	.ToSql();
+	.ToSqlQuery();
 ```
 which will produce a result like:
 ```sql
@@ -229,7 +229,7 @@ var name = "John";
 var sql = builder
 	.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1", age, addressId)
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
-	.ToSql();
+	.ToSqlQuery();
 ```
 and the result would be as expected:
 ```sql
