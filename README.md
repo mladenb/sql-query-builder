@@ -79,41 +79,65 @@ var builder = new SqlQueryBuilder();
 ```
 which we'll use in all the following examples. For example, let's select everything from a table `User`:
 ```csharp
-var sql = builder
+var query = builder
 	.From<User>()
 	.SelectAll()
 	.ToSqlQuery();
 ```
-This will produce an SQL command in the form of:
+
+This will produce an SQL query, with the Command property:
+
 ```sql
 SELECT *
 FROM [User]
 ```
+
 Now, let's filter our result set with a `WHERE` clause:
+
 ```csharp
 var name = "John";
 
-var sql = builder
+var query = builder
 	.From<User>()
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 	.SelectAll()
 	.ToSqlQuery();
 ```
-That will result with an SQL command like this:
+
+That will result with an SQL query, with the Command property:
+
 ```sql
 SELECT *
 FROM [User]
 WHERE ([User].[Name] LIKE '%' + @0 + '%')
 ```
-with the trailing SQL parameters set to:
+
+and its Parameters property:
+
 ```sql
 @0 = "John"
 ```
-We made use of the [String.Format()](https://msdn.microsoft.com/en-us/library/system.string.format(v=vs.110).aspx) method in order to leverage the help of IntelliSense, to help us write queries more conveniently. In these examples, we used the "[string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated)" feature of the C# language, to make things even easier. The usage of generic methods, like `Where()`, also helps us expand the possible choices, every time we do an additional join, by providing us with the appropriate lambda parameters, according to the tables, used in those joins.
+
+Note that we made use of the [String.Format()](https://msdn.microsoft.com/en-us/library/system.string.format(v=vs.110).aspx)
+method in order to leverage the help of [IntelliSense](https://docs.microsoft.com/en-us/visualstudio/ide/using-intellisense),
+to help us write queries more conveniently. We also used the "[string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated)"
+feature of the C# language, to make things even easier.
+
+The string `$"{user.Name} LIKE '%' + @0 + '%'"` is the same as `string.Format("{0} LIKE '%' + @0 + '%'", user.Name)`.
+
+The SqlQueryBuilder will parse this construct and enumerate all the classes and
+properties used and will map them to the appropriate tables/columns of the
+underlying SQL database. The default convention is to use the same naming for the
+C# classes and SQL tables, as well as the same naming for the C# properties on
+those classes and SQL columns of those tables. We can, of course, customize this
+mapping by [providing our own mapper implementations](#mapping-table-column-names).
 
 ## Reusing queries
 
-If we want to create a simple SQL query (in the example below: `baseQuery`), and later reuse it, to construct more complex queries (`joinQuery`), we could write something like this:
+If we want to create a simple SQL query (in the example below: `baseQuery`), and
+later reuse it, to construct more complex queries (`joinQuery`), we could write
+something like this:
+
 ```csharp
 var name = "John";
 var userGroupIds = new[] { 1, 2, 3 };
@@ -129,20 +153,26 @@ var joinQuery = baseQuery
 	.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", userGroupIds)
 	.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-var baseSql = baseQuery.ToSqlQuery();
-var joinSql = joinQuery.ToSqlQuery();
+var baseSqlQuery = baseQuery.ToSqlQuery();
+var joinSqlQuery = joinQuery.ToSqlQuery();
 ```
-we would end up with 2 SQL strings. The first one being `baseSql`, which would look like this:
+
+we would end up with 2 SQL queries. The first one, `baseSqlQuery`, would have a Command:
+
 ```sql
 SELECT *
 FROM [User]
 WHERE ([User].[Name] LIKE '%' + @0 + '%')
 ```
-with SQL query parameters set to:
+
+and its Parameters set to:
+
 ```sql
 @0 = "John"
 ```
-and the second SQL string, `joinSql`, which would look like:
+
+The second SQL query, `joinSqlQuery`, would have Command/Parameters properties set to:
+
 ```sql
 SELECT [User].[Id], [User].[Name], [User].[Age]
 FROM [User]
@@ -150,18 +180,20 @@ INNER JOIN [Address] ON [User].[AddressId] = [Address].[Id]
 INNER JOIN [UserGroup] ON [User].[UserGroupId] = [UserGroup].[Id]
 WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1,@2,@3)))
 ```
-with SQL query parameters set to:
 ```sql
 @0 = "John"
 @1 = 1
 @2 = 2
 @3 = 3
 ```
-Note that, in the joinSql, the first `SELECT *` got replaced with the later one `SELECT [User].[Id]...`.
+
+Note that, in the `joinSqlQuery`, the first "`SELECT *`" got replaced with the second
+"`SELECT [User].[Id]...`", and the `WHERE` clauses got merged.
 
 ## A couple of more complex queries
 
 We can create even more complex queries, expanding the list of joined tables with multiple `WHERE` statements, later combined into one:
+
 ```csharp
 var name = "John";
 var userGroupIds = new[] { 1, 2, 3 };
@@ -178,16 +210,24 @@ var joinQuery = baseQuery
 	.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", userGroupIds)
 	.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-var baseSql = baseQuery.ToSqlQuery();
-var joinSql = joinQuery.ToSqlQuery();
+var baseSqlQuery = baseQuery.ToSqlQuery();
+var joinSqlQuery = joinQuery.ToSqlQuery();
 ```
-which would result in 2 SQL strings. The first one, `baseSql`:
+
+which would result in 2 SQL strings.
+The first one, `baseSqlQuery` would have the Command/Parameters properties like:
+
 ```sql
 SELECT *
 FROM [User]
 WHERE ([User].[Name] LIKE '%' + @0 + '%')
 ```
-and the second, `joinSql`:
+```sql
+@0 = "John"
+```
+
+and the second query, `joinSqlQuery`, would look like:
+
 ```sql
 SELECT [User].[Id], [User].[Name], [User].[Age]
 FROM [User]
@@ -195,57 +235,98 @@ INNER JOIN [Address] ON [User].[AddressId] = [Address].[Id]
 INNER JOIN [UserGroup] ON [User].[UserGroupId] = [UserGroup].[Id]
 WHERE ((([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] = 1)) AND ([User].[UserGroupId] IN (@1,@2,@3)))
 ```
+```sql
+@0 = "John"
+@1 = 1
+@2 = 2
+@3 = 3
+```
 
 ## INSERT / UPDATE made easy
 
 In order to create an `INSERT` SQL statement, it is just enough to write something like this:
+
 ```csharp
 var age = 10;
 var addressId = 1;
 var name = "John";
 
-var sql = builder
+var query = builder
 	.Insert<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", age, addressId, name)
 	.ToSqlQuery();
 ```
-which would produce this as a result:
+
+which would produce this SqlQuery as a result:
+
 ```sql
 INSERT INTO [User] ([User].[Age], [User].[AddressId], [User].[Name])
 VALUES (@0, @1, @2)
 ```
+```sql
+@0 = 10
+@1 = 1
+@2 = "John"
+```
+
 *(TODO Add INSERT multiple values)*
+
 For the `UPDATE` statement, it's quite similar:
+
 ```csharp
 var age = 10;
 var addressId = 1;
 var name = "John";
 
-var sql = builder
+var query = builder
 	.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1, {user.Name} = @2", age, addressId, name)
 	.ToSqlQuery();
 ```
-which will produce a result like:
+
+which will produce an SqlQuery like:
+
 ```sql
 UPDATE [User]
 SET [User].[Age] = @0, [User].[AddressId] = @1, [User].[Name] = @2
 ```
-Adding a `WHERE` statement is also a trivial thing to do:
+```sql
+@0 = 10
+@1 = 1
+@2 = "John"
+```
+
+Adding a `WHERE` statement:
+
 ```csharp
 var age = 10;
 var addressId = 1;
 var name = "John";
 
-var sql = builder
+var query = builder
 	.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1", age, addressId)
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 	.ToSqlQuery();
 ```
+
 and the result would be as expected:
+
 ```sql
 UPDATE [User]
 SET [User].[Age] = @0, [User].[AddressId] = @1
 WHERE ([User].[Name] LIKE '%' + @2 + '%')
 ```
+```sql
+@0 = 10
+@1 = 1
+@2 = "John"
+```
+
+Note that we don't have to keep track of the last parameter index used in previous
+statements/clauses, because each new statement/clause will start enumerating its
+parameters from a zero-based index.
+
+That's why, in the previous query in the `Where()` method, we didn't use the index "`@2`"
+for the user's name placeholder, but we rather used the parameter with index "`@0`".
+
 
 ## Mapping table/column names
 
@@ -306,7 +387,7 @@ public class NPocoColumnNameResolver : IColumnNameResolver
 ```
 then we can make use of the [NPoco's mapping feature](https://github.com/schotime/NPoco/wiki/Mapping) and have even more customized SQL strings. We just need to create an instance of an SqlQueryBuilder like this:
 ```csharp
-var db = new NPoco.Database("connStringName");
+var db = new NPoco.Database("connectionString");
 var tableNameResolver = new NPocoTableNameResolver(db);
 var columnNameResolver = new NPocoColumnNameResolver(db);
 
