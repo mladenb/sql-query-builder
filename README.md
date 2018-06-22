@@ -132,6 +132,27 @@ C# classes and SQL tables, as well as the same naming for the C# properties on
 those classes and SQL columns of those tables. We can, of course, customize this
 mapping by [providing our own mapper implementations](#mapping-table-column-names).
 
+Once we have our query built, we can use it, for example, directly using
+[`System.Data.SqlClient.SqlConnection`](https://github.com/dotnet/corefx/blob/master/src/System.Data.SqlClient/src/System/Data/SqlClient/SqlConnection.cs), like this:
+
+```csharp
+using (var connection = new SqlConnection(ConnectionString))
+{
+	IDbCommand cmd = connection.CreateCommand();
+	cmd.CommandText = query.Command;
+
+	var param = cmd.CreateParameter();
+	param.ParameterName = "@0";
+	param.Value = query.Parameters[0];
+
+	connection.Open();
+	...
+}
+```
+
+Of course, this is just a basic example how can we use the query that SqlQueryBuilder
+has generated for us. But we can also use our favorite ORM solution instead.
+
 ## Reusing queries
 
 If we want to create a simple SQL query (in the example below: `baseQuery`), and
