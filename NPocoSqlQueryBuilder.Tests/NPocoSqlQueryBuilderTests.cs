@@ -33,7 +33,7 @@ namespace NPocoSqlQueryBuilder.Tests
 			});
 
 			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 0);
+			Assert.AreEqual(0, sql.Arguments.Length);
 		}
 
 		[TestMethod]
@@ -55,8 +55,8 @@ namespace NPocoSqlQueryBuilder.Tests
 			});
 
 			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 1);
-			Assert.AreEqual(sql.Arguments.First(), name);
+			Assert.AreEqual(1, sql.Arguments.Length);
+			Assert.AreEqual(name, sql.Arguments.First());
 		}
 
 		[TestMethod]
@@ -88,8 +88,8 @@ namespace NPocoSqlQueryBuilder.Tests
 			});
 
 			Assert.That.SqlsAreEqual(expectedResult, joinSql.SQL);
-			Assert.AreEqual(joinSql.Arguments.Length, 4);
-			Assert.AreEqual(joinSql.Arguments.First(), name);
+			Assert.AreEqual(4, joinSql.Arguments.Length);
+			Assert.AreEqual(name, joinSql.Arguments.First());
 		}
 
 		[TestMethod]
@@ -122,8 +122,8 @@ namespace NPocoSqlQueryBuilder.Tests
 			});
 
 			Assert.That.SqlsAreEqual(expectedResult, joinSql.SQL);
-			Assert.AreEqual(joinSql.Arguments.Length, 4);
-			Assert.AreEqual(joinSql.Arguments.First(), name);
+			Assert.AreEqual(4, joinSql.Arguments.Length);
+			Assert.AreEqual(name, joinSql.Arguments.First());
 		}
 
 		[TestMethod]
@@ -144,10 +144,10 @@ namespace NPocoSqlQueryBuilder.Tests
 			});
 
 			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 3);
-			Assert.AreEqual(sql.Arguments[0], age);
-			Assert.AreEqual(sql.Arguments[1], addressId);
-			Assert.AreEqual(sql.Arguments[2], name);
+			Assert.AreEqual(3, sql.Arguments.Length);
+			Assert.AreEqual(age, sql.Arguments[0]);
+			Assert.AreEqual(addressId, sql.Arguments[1]);
+			Assert.AreEqual(name, sql.Arguments[2]);
 		}
 
 		[TestMethod]
@@ -168,10 +168,10 @@ namespace NPocoSqlQueryBuilder.Tests
 			});
 
 			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 3);
-			Assert.AreEqual(sql.Arguments[0], age);
-			Assert.AreEqual(sql.Arguments[1], addressId);
-			Assert.AreEqual(sql.Arguments[2], name);
+			Assert.AreEqual(3, sql.Arguments.Length);
+			Assert.AreEqual(age, sql.Arguments[0]);
+			Assert.AreEqual(addressId, sql.Arguments[1]);
+			Assert.AreEqual(name, sql.Arguments[2]);
 		}
 
 		[TestMethod]
@@ -194,10 +194,10 @@ namespace NPocoSqlQueryBuilder.Tests
 			});
 
 			Assert.That.SqlsAreEqual(expectedResult, sql.SQL);
-			Assert.AreEqual(sql.Arguments.Length, 3);
-			Assert.AreEqual(sql.Arguments[0], age);
-			Assert.AreEqual(sql.Arguments[1], addressId);
-			Assert.AreEqual(sql.Arguments[2], name);
+			Assert.AreEqual(3, sql.Arguments.Length, 3);
+			Assert.AreEqual(age, sql.Arguments[0]);
+			Assert.AreEqual(addressId, sql.Arguments[1]);
+			Assert.AreEqual(name, sql.Arguments[2]);
 		}
 	}
 

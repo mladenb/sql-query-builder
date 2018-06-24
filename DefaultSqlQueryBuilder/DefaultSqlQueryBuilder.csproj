@@ -16,7 +16,7 @@
     <RepositoryUrl>https://github.com/mladenb/sql-query-builder</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>sql query builder linq</PackageTags>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
 </Project>

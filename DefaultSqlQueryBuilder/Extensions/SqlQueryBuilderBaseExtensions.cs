@@ -1,12 +1,11 @@
-﻿using DefaultSqlQueryBuilder.Clauses;
-using System;
+﻿using System;
 using System.Linq;
 
 namespace DefaultSqlQueryBuilder.Extensions
 {
 	public static class SqlQueryBuilderBaseExtensions
 	{
-		public static CustomSqlClause ToSql(this SqlQueryBuilderBase source)
+		public static SqlQuery ToSqlQuery(this SqlQueryBuilderBase source)
 		{
 			if (source == null) throw new ArgumentNullException(nameof(source));
 
@@ -15,7 +14,9 @@ namespace DefaultSqlQueryBuilder.Extensions
 				.ConsolidateWhereClauses()
 				.Select(c => c.ToSql());
 
-			return sqls.Aggregate((current, sql) => current.Append(sql.Sql, sql.Parameters));
+			var result = sqls.Aggregate((current, sql) => current.Append(sql.Sql, sql.Parameters));
+
+			return new SqlQuery(result.Sql, result.Parameters);
 		}
 	}
 }

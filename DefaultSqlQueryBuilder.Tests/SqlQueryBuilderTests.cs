@@ -16,10 +16,10 @@ namespace DefaultSqlQueryBuilder.Tests
 		[TestMethod]
 		public void SelectWithoutWhereTest()
 		{
-			var sql = CreateSqlQueryBuilder()
+			var query = CreateSqlQueryBuilder()
 				.From<User>()
 				.SelectAll()
-				.ToSql();
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
 			{
@@ -27,8 +27,8 @@ namespace DefaultSqlQueryBuilder.Tests
 				"FROM [User]",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
-			Assert.AreEqual(sql.Parameters.Length, 0);
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(0, query.Parameters.Length);
 		}
 
 		[TestMethod]
@@ -36,11 +36,11 @@ namespace DefaultSqlQueryBuilder.Tests
 		{
 			const string name = "John";
 
-			var sql = CreateSqlQueryBuilder()
+			var query = CreateSqlQueryBuilder()
 				.From<User>()
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.SelectAll()
-				.ToSql();
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
 			{
@@ -49,9 +49,9 @@ namespace DefaultSqlQueryBuilder.Tests
 				"WHERE ([User].[Name] LIKE '%' + @0 + '%')",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
-			Assert.AreEqual(sql.Parameters.Length, 1);
-			Assert.AreEqual(sql.Parameters.First(), name);
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(1, query.Parameters.Length);
+			Assert.AreEqual(name, query.Parameters.First());
 		}
 
 		[TestMethod]
@@ -71,7 +71,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", validUserGroupIds)
 				.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-			var joinSql = joinQuery.ToSql();
+			var query = joinQuery.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
 			{
@@ -82,9 +82,9 @@ namespace DefaultSqlQueryBuilder.Tests
 				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1)))",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, joinSql.Sql);
-			Assert.AreEqual(joinSql.Parameters.Length, 2);
-			Assert.AreEqual(joinSql.Parameters.First(), name);
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(2, query.Parameters.Length);
+			Assert.AreEqual(name, query.Parameters.First());
 		}
 
 		[TestMethod]
@@ -105,7 +105,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", validUserGroupIds)
 				.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-			var joinSql = joinQuery.ToSql();
+			var query = joinQuery.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
 			{
@@ -116,9 +116,9 @@ namespace DefaultSqlQueryBuilder.Tests
 				"WHERE ((([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] = 1)) AND ([User].[UserGroupId] IN (@1)))",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, joinSql.Sql);
-			Assert.AreEqual(joinSql.Parameters.Length, 2);
-			Assert.AreEqual(joinSql.Parameters.First(), name);
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(2, query.Parameters.Length);
+			Assert.AreEqual(name, query.Parameters.First());
 		}
 
 		[TestMethod]
@@ -128,9 +128,9 @@ namespace DefaultSqlQueryBuilder.Tests
 			const int addressId = 1;
 			const string name = "John";
 
-			var sql = CreateSqlQueryBuilder()
+			var query = CreateSqlQueryBuilder()
 				.Insert<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", age, addressId, name)
-				.ToSql();
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
 			{
@@ -138,11 +138,11 @@ namespace DefaultSqlQueryBuilder.Tests
 				"VALUES (@0, @1, @2)",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
-			Assert.AreEqual(sql.Parameters.Length, 3);
-			Assert.AreEqual(sql.Parameters[0], age);
-			Assert.AreEqual(sql.Parameters[1], addressId);
-			Assert.AreEqual(sql.Parameters[2], name);
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(3, query.Parameters.Length);
+			Assert.AreEqual(age, query.Parameters[0]);
+			Assert.AreEqual(addressId, query.Parameters[1]);
+			Assert.AreEqual(name, query.Parameters[2]);
 		}
 
 		[TestMethod]
@@ -152,9 +152,9 @@ namespace DefaultSqlQueryBuilder.Tests
 			const int addressId = 1;
 			const string name = "John";
 
-			var sql = CreateSqlQueryBuilder()
+			var query = CreateSqlQueryBuilder()
 				.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1, {user.Name} = @2", age, addressId, name)
-				.ToSql();
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
 			{
@@ -162,11 +162,11 @@ namespace DefaultSqlQueryBuilder.Tests
 				"SET [User].[Age] = @0, [User].[AddressId] = @1, [User].[Name] = @2",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
-			Assert.AreEqual(sql.Parameters.Length, 3);
-			Assert.AreEqual(sql.Parameters[0], age);
-			Assert.AreEqual(sql.Parameters[1], addressId);
-			Assert.AreEqual(sql.Parameters[2], name);
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(3, query.Parameters.Length);
+			Assert.AreEqual(age, query.Parameters[0]);
+			Assert.AreEqual(addressId, query.Parameters[1]);
+			Assert.AreEqual(name, query.Parameters[2]);
 		}
 
 		[TestMethod]
@@ -176,10 +176,10 @@ namespace DefaultSqlQueryBuilder.Tests
 			const int addressId = 1;
 			const string name = "John";
 
-			var sql = CreateSqlQueryBuilder()
+			var query = CreateSqlQueryBuilder()
 				.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1", age, addressId)
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
-				.ToSql();
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
 			{
@@ -188,11 +188,11 @@ namespace DefaultSqlQueryBuilder.Tests
 				"WHERE ([User].[Name] LIKE '%' + @2 + '%')",
 			});
 
-			Assert.That.SqlsAreEqual(expectedResult, sql.Sql);
-			Assert.AreEqual(sql.Parameters.Length, 3);
-			Assert.AreEqual(sql.Parameters[0], age);
-			Assert.AreEqual(sql.Parameters[1], addressId);
-			Assert.AreEqual(sql.Parameters[2], name);
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(3, query.Parameters.Length);
+			Assert.AreEqual(age, query.Parameters[0]);
+			Assert.AreEqual(addressId, query.Parameters[1]);
+			Assert.AreEqual(name, query.Parameters[2]);
 		}
 	}
 
