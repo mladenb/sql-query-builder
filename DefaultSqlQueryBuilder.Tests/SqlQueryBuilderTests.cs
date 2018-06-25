@@ -194,6 +194,43 @@ namespace DefaultSqlQueryBuilder.Tests
 			Assert.AreEqual(addressId, query.Parameters[1]);
 			Assert.AreEqual(name, query.Parameters[2]);
 		}
+
+		[TestMethod]
+		public void DeleteWithoutWhereTest()
+		{
+			var query = CreateSqlQueryBuilder()
+				.Delete<User>()
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"DELETE FROM [User]",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(0, query.Parameters.Length);
+		}
+
+		[TestMethod]
+		public void DeleteWithWhereTest()
+		{
+			const string name = "John";
+
+			var query = CreateSqlQueryBuilder()
+				.Delete<User>()
+				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"DELETE FROM [User]",
+				"WHERE ([User].[Name] LIKE '%' + @0 + '%')",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(1, query.Parameters.Length);
+			Assert.AreEqual(name, query.Parameters[0]);
+		}
 	}
 
 	internal class User

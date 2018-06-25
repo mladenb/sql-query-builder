@@ -44,7 +44,7 @@ namespace NPocoSqlQueryBuilder.Extensions
 					return Sql.Builder.From(fromClause.TableName);
 
 				case DeleteSqlClause deleteClause:
-					return Sql.Builder.Append($"DELETE FROM {deleteClause.TableName}", deleteClause.Parameters);
+					return Sql.Builder.Append($"DELETE FROM {deleteClause.TableName}");
 
 				case CustomSqlClause customClause:
 					return Sql.Builder.Append(customClause.Sql, customClause.Parameters);

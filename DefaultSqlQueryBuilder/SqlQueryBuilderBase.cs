@@ -88,6 +88,11 @@ namespace DefaultSqlQueryBuilder
 			_clauses.Insert(0, new UpdateSqlClause(TableNameFor<TTable>(), columns, parameters));
 		}
 
+		protected void AddDelete<TTable>()
+		{
+			_clauses.Add(new DeleteSqlClause(TableNameFor<TTable>()));
+		}
+
 		protected void AddGroupBy(string columns)
 		{
 			_clauses.Add(new GroupBySqlClause(columns));
@@ -105,6 +110,11 @@ namespace DefaultSqlQueryBuilder
 
 		protected string ParseStringFormatExpression(Expression expression)
 		{
+			if (expression.NodeType == ExpressionType.Constant && expression.Type == typeof(string))
+			{
+				return (string)((ConstantExpression) expression).Value;
+			}
+
 			var stringFormatExpression = GetStringFormatMethodCallExpression(expression);
 
 			var stringPattern = ((ConstantExpression)stringFormatExpression.Arguments.First())

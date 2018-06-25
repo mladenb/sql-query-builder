@@ -3,12 +3,10 @@ namespace DefaultSqlQueryBuilder.Clauses
 	public class DeleteSqlClause : SqlClause
 	{
 		public string TableName { get; }
-		public object[] Parameters { get; }
 
-		public DeleteSqlClause(string tableName, object[] parameters)
+		public DeleteSqlClause(string tableName)
 		{
 			TableName = tableName;
-			Parameters = parameters;
 		}
 	}
 }

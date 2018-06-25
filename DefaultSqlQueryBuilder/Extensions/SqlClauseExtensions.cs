@@ -39,7 +39,7 @@ namespace DefaultSqlQueryBuilder.Extensions
 					return new CustomSqlClause($"FROM {fromClause.TableName}");
 
 				case DeleteSqlClause deleteClause:
-					return new CustomSqlClause($"DELETE FROM {deleteClause.TableName}", deleteClause.Parameters);
+					return new CustomSqlClause($"DELETE FROM {deleteClause.TableName}");
 
 				case CustomSqlClause customClause:
 					return customClause;

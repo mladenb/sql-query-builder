@@ -34,6 +34,11 @@ namespace DefaultSqlQueryBuilder
 			return UpdateAndExpand<TTable>(sqlBuilder => sqlBuilder.AddUpdate<TTable>(ParseStringFormatExpression(stringExpression.Body), parameters));
 		}
 
+		public SqlQueryBuilder<TTable> Delete<TTable>()
+		{
+			return UpdateAndExpand<TTable>(sqlBuilder => sqlBuilder.AddDelete<TTable>());
+		}
+
 		private SqlQueryBuilder<TNew> UpdateAndExpand<TNew>(Action<SqlQueryBuilder> updateAction)
 		{
 			var clone = Clone();
