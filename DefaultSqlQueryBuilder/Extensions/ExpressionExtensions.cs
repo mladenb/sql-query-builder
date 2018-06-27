@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace DefaultSqlQueryBuilder.Extensions
 {
@@ -7,7 +6,7 @@ namespace DefaultSqlQueryBuilder.Extensions
 	{
 		public static MemberExpression AsMemberExpression(this Expression expression)
 		{
-			if (expression == null) throw new ArgumentNullException(nameof(expression));
+			if (expression == null) return null;
 
 			return expression as MemberExpression
 				?? AsMemberExpression((expression as UnaryExpression)?.Operand);

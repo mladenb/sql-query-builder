@@ -231,6 +231,24 @@ namespace DefaultSqlQueryBuilder.Tests
 			Assert.AreEqual(1, query.Parameters.Length);
 			Assert.AreEqual(name, query.Parameters[0]);
 		}
+
+		[TestMethod]
+		public void QueryWithTableNamesRegressionTest()
+		{
+			var query = CreateSqlQueryBuilder()
+				.From<User>()
+				.Select(u => $"{u.Name}, {u}.[Age], {u.AddressId}")
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"SELECT [User].[Name], [User].[Age], [User].[AddressId]",
+				"FROM [User]",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(0, query.Parameters.Length);
+		}
 	}
 
 	internal class User
