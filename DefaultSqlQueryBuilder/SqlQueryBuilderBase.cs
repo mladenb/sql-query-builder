@@ -93,6 +93,11 @@ namespace DefaultSqlQueryBuilder
 			_clauses.Add(new DeleteSqlClause(TableNameFor<TTable>()));
 		}
 
+		protected void AddFirstCustom(string sql, object[] parameters)
+		{
+			_clauses.Insert(0, new CustomSqlClause(sql, parameters));
+		}
+
 		protected void AddGroupBy(string columns)
 		{
 			_clauses.Add(new GroupBySqlClause(columns));

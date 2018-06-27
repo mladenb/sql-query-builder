@@ -233,6 +233,31 @@ namespace DefaultSqlQueryBuilder.Tests
 		}
 
 		[TestMethod]
+		public void CustomStatementFirstTest()
+		{
+			const int age = 10;
+			const int addressId = 1;
+			const string name = "John";
+
+			var customInsertQuery = CreateSqlQueryBuilder()
+				.Custom<User>(u => $"INSERT INTO {u} ({u.Name}, {u.Age}, {u.AddressId}) OUTPUT INSERTED.Id VALUES (@0, @1, @2)", name, age, addressId)
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"INSERT INTO [User] ([User].[Name], [User].[Age], [User].[AddressId])",
+				"OUTPUT INSERTED.Id",
+				"VALUES (@0, @1, @2)",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, customInsertQuery.Command);
+			Assert.AreEqual(3, customInsertQuery.Parameters.Length);
+			Assert.AreEqual(name, customInsertQuery.Parameters[0]);
+			Assert.AreEqual(age, customInsertQuery.Parameters[1]);
+			Assert.AreEqual(addressId, customInsertQuery.Parameters[2]);
+		}
+
+		[TestMethod]
 		public void QueryWithTableNamesRegressionTest()
 		{
 			var query = CreateSqlQueryBuilder()
