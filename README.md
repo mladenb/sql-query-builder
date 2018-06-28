@@ -84,16 +84,18 @@ which we'll use in all the following examples. For example, let's select everyth
 var query = builder
 	.From<User>()
 	.SelectAll();
+
+var sql = query.ToSqlQuery();
 ```
 
-If we now apply `.ToSqlQuery()` extension method on this query, it will produce an SQL query, with the Command property:
+In our `sql` variable, we'll have an SqlQuery object, with the Command property set to:
 
 ```sql
 SELECT *
 FROM [User]
 ```
 
-But, if we don't materialize that query yet, and instead, we filter our result set with a `WHERE` clause:
+And if we extend that query, by adding a filter to our result set, using a `WHERE` clause:
 
 ```csharp
 var name = "John";
@@ -101,9 +103,11 @@ var name = "John";
 var newQuery = query
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 	.ToSqlQuery();
+
+var newSql = newQuery.ToSqlQuery();
 ```
 
-that will create an SQL query, with the Command property:
+that will create an SqlQuery, with the Command property:
 
 ```sql
 SELECT *
@@ -174,11 +178,11 @@ var usersByNameExtendedQuery = usersByNameQuery
 	.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", userGroupIds)
 	.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-var usersByNameSqlQuery = usersByNameQuery.ToSqlQuery();
-var usersByNameExtendedSqlQuery = usersByNameExtendedQuery.ToSqlQuery();
+var usersByNameSql = usersByNameQuery.ToSqlQuery();
+var usersByNameExtendedSql = usersByNameExtendedQuery.ToSqlQuery();
 ```
 
-we would end up with 2 SQL queries. The first one, `usersByNameSqlQuery`, would have a Command:
+we would end up with 2 SqlQuery objects. The first one, `usersByNameSql`, would have a Command:
 
 ```sql
 SELECT *
@@ -192,7 +196,7 @@ and its Parameters set to:
 @0 = "John"
 ```
 
-The second SQL query, `usersByNameExtendedSqlQuery`, would have Command/Parameters properties set to:
+The second SqlQuery, `usersByNameExtendedSql`, would have Command/Parameters properties set to:
 
 ```sql
 SELECT [User].[Id], [User].[Name], [User].[Age]
@@ -208,7 +212,7 @@ WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1,@2,@
 @3 = 3
 ```
 
-Note that, in the `usersByNameExtendedSqlQuery`, the first "`SELECT *`" got replaced with the second
+Note that, in the `usersByNameExtendedSql`, the first "`SELECT *`" got replaced with the second
 "`SELECT [User].[Id]...`", and all the `WHERE` clauses got merged.
 
 ## A couple of more complex queries
@@ -231,12 +235,12 @@ var joinQuery = baseQuery
 	.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", userGroupIds)
 	.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-var baseSqlQuery = baseQuery.ToSqlQuery();
-var joinSqlQuery = joinQuery.ToSqlQuery();
+var baseSql = baseQuery.ToSqlQuery();
+var joinSql = joinQuery.ToSqlQuery();
 ```
 
-which would result in 2 SQL strings.
-The first one, `baseSqlQuery` would have the Command/Parameters properties like:
+which would result in 2 SqlQuery objects.
+The first one, `baseSql` would have the Command/Parameters properties like:
 
 ```sql
 SELECT *
@@ -247,7 +251,7 @@ WHERE ([User].[Name] LIKE '%' + @0 + '%')
 @0 = "John"
 ```
 
-and the second query, `joinSqlQuery`, would look like:
+and the second query, `joinSql`, would look like:
 
 ```sql
 SELECT [User].[Id], [User].[Name], [User].[Age]
@@ -272,7 +276,7 @@ var age = 10;
 var addressId = 1;
 var name = "John";
 
-var query = builder
+var insertSql = builder
 	.Insert<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", age, addressId, name)
 	.ToSqlQuery();
 ```
@@ -303,7 +307,7 @@ var parameters = users
 	.Select(u => new object[] { u.Age, u.AddressId, u.Name })
 	.ToArray();
 
-var query = builder
+var insertMultipleSql = builder
 	.InsertMultiple<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", parameters)
 	.ToSqlQuery();
 ```
@@ -333,7 +337,7 @@ var age = 10;
 var addressId = 1;
 var name = "John";
 
-var query = builder
+var updateSql = builder
 	.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1, {user.Name} = @2", age, addressId, name)
 	.ToSqlQuery();
 ```
@@ -357,7 +361,7 @@ var age = 10;
 var addressId = 1;
 var name = "John";
 
-var query = builder
+var updateByNameSql = builder
 	.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1", age, addressId)
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 	.ToSqlQuery();
