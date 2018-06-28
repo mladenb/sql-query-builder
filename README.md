@@ -77,34 +77,33 @@ Let's take a look at some examples, which would explain it better, hopefully. Fi
 ```csharp
 var builder = new SqlQueryBuilder();
 ```
+
 which we'll use in all the following examples. For example, let's select everything from a table `User`:
+
 ```csharp
 var query = builder
 	.From<User>()
-	.SelectAll()
-	.ToSqlQuery();
+	.SelectAll();
 ```
 
-This will produce an SQL query, with the Command property:
+If we now apply `.ToSqlQuery()` extension method on this query, it will produce an SQL query, with the Command property:
 
 ```sql
 SELECT *
 FROM [User]
 ```
 
-Now, let's filter our result set with a `WHERE` clause:
+But, if we don't materialize that query yet, and instead, we filter our result set with a `WHERE` clause:
 
 ```csharp
 var name = "John";
 
-var query = builder
-	.From<User>()
+var newQuery = query
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
-	.SelectAll()
 	.ToSqlQuery();
 ```
 
-That will result with an SQL query, with the Command property:
+that will create an SQL query, with the Command property:
 
 ```sql
 SELECT *
