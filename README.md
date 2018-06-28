@@ -289,7 +289,7 @@ VALUES (@0, @1, @2)
 @2 = "John"
 ```
 
-In order to perform an `INSERT` SQL statement with multiple rows of data at once, we would write:
+In order to create an `INSERT` SQL statement with multiple rows of data at once, we would write:
 
 ```csharp
 var users = new[]
