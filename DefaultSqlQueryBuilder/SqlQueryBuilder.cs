@@ -29,6 +29,11 @@ namespace DefaultSqlQueryBuilder
 			return UpdateAndExpand<TTable>(sqlBuilder => sqlBuilder.AddInsert<TTable>(ParseStringFormatExpression(stringExpression.Body), parameters));
 		}
 
+		public SqlQueryBuilder<TTable> InsertMultiple<TTable>(Expression<Func<TTable, string>> stringExpression, params object[][] parameters)
+		{
+			return UpdateAndExpand<TTable>(sqlBuilder => sqlBuilder.AddInsertMultiple<TTable>(ParseStringFormatExpression(stringExpression.Body), parameters));
+		}
+
 		public SqlQueryBuilder<TTable> Update<TTable>(Expression<Func<TTable, string>> stringExpression, params object[] parameters)
 		{
 			return UpdateAndExpand<TTable>(sqlBuilder => sqlBuilder.AddUpdate<TTable>(ParseStringFormatExpression(stringExpression.Body), parameters));

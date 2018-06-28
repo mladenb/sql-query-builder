@@ -146,6 +146,59 @@ namespace DefaultSqlQueryBuilder.Tests
 		}
 
 		[TestMethod]
+		public void InsertMultipleTest()
+		{
+			var users = new[]
+			{
+				new User
+				{
+					Name = "John",
+					Age = 10,
+					AddressId = 1,
+				},
+				new User
+				{
+					Name = "Jane",
+					Age = 20,
+					AddressId = 2,
+				},
+				new User
+				{
+					Name = "Smith",
+					Age = 30,
+					AddressId = 3,
+				},
+			};
+
+			var parameters = users.Select(u => new object[] { u.Age, u.AddressId, u.Name }).ToArray();
+
+			var query = CreateSqlQueryBuilder()
+				.InsertMultiple<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", parameters)
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"INSERT INTO [User] ([User].[Age], [User].[AddressId], [User].[Name])",
+				"VALUES (@0, @1, @2), (@3, @4, @5), (@6, @7, @8)",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(9, query.Parameters.Length);
+
+			Assert.AreEqual(parameters[0][0], query.Parameters[0]);
+			Assert.AreEqual(parameters[0][1], query.Parameters[1]);
+			Assert.AreEqual(parameters[0][2], query.Parameters[2]);
+
+			Assert.AreEqual(parameters[1][0], query.Parameters[3]);
+			Assert.AreEqual(parameters[1][1], query.Parameters[4]);
+			Assert.AreEqual(parameters[1][2], query.Parameters[5]);
+
+			Assert.AreEqual(parameters[2][0], query.Parameters[6]);
+			Assert.AreEqual(parameters[2][1], query.Parameters[7]);
+			Assert.AreEqual(parameters[2][2], query.Parameters[8]);
+		}
+
+		[TestMethod]
 		public void UpdateWithoutWhereTest()
 		{
 			const int age = 10;

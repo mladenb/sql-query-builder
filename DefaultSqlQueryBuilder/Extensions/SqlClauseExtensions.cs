@@ -29,6 +29,11 @@ namespace DefaultSqlQueryBuilder.Extensions
 				case InsertSqlClause insertClause:
 					return new CustomSqlClause($"INSERT INTO {insertClause.TableName} ({insertClause.Columns}) VALUES ({ToPlaceholdersCsv(insertClause.Parameters)})", insertClause.Parameters);
 
+				case InsertMultipleSqlClause insertMultipleClause:
+					var monkeys = GetInsertMultipleMonkeys(insertMultipleClause.Parameters);
+					var values = GetInsertMultipleValues(insertMultipleClause.Parameters);
+					return new CustomSqlClause($"INSERT INTO {insertMultipleClause.TableName} ({insertMultipleClause.Columns}) VALUES {monkeys}", values);
+
 				case InnerJoinSqlClause innerJoinClause:
 					return new CustomSqlClause($"INNER JOIN {innerJoinClause.TableName} ON {innerJoinClause.OnConditions}", innerJoinClause.Parameters);
 
@@ -91,13 +96,27 @@ namespace DefaultSqlQueryBuilder.Extensions
 			return new CustomSqlClause(newClause.Sql, newClause.Parameters);
 		}
 
+		private static object[] GetInsertMultipleValues(IEnumerable<IEnumerable<object>> parameters)
+		{
+			return parameters
+				.SelectMany(o => o)
+				.ToArray();
+		}
+
+		private static string GetInsertMultipleMonkeys(IEnumerable<object[]> rows)
+		{
+			var values = rows.Select((row, index) => "(" + ToPlaceholdersCsv(row, index * row.Length) + ")");
+
+			return string.Join(", ", values);
+		}
+
 		/// <summary>
 		/// Given the list of parameters, returns the CSV list of SQL parameter placeholders (@0, @1, @2, ...)
 		/// </summary>
-		private static string ToPlaceholdersCsv(IEnumerable<object> parameters)
+		private static string ToPlaceholdersCsv(IEnumerable<object> parameters, int startFrom = 0)
 		{
 			var monkeys = parameters
-				.Select((o, i) => $"@{i}");
+				.Select((o, i) => $"@{startFrom + i}");
 
 			return string.Join(", ", monkeys);
 		}

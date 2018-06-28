@@ -79,7 +79,15 @@ namespace DefaultSqlQueryBuilder
 		protected void AddInsert<TTable>(string columns, object[] parameters)
 		{
 			_clauses.RemoveAll(clause => clause is InsertSqlClause);
+			_clauses.RemoveAll(clause => clause is InsertMultipleSqlClause);
 			_clauses.Insert(0, new InsertSqlClause(TableNameFor<TTable>(), columns, parameters));
+		}
+
+		protected void AddInsertMultiple<TTable>(string columns, object[][] parameters)
+		{
+			_clauses.RemoveAll(clause => clause is InsertSqlClause);
+			_clauses.RemoveAll(clause => clause is InsertMultipleSqlClause);
+			_clauses.Insert(0, new InsertMultipleSqlClause(TableNameFor<TTable>(), columns, parameters));
 		}
 
 		protected void AddUpdate<TTable>(string columns, object[] parameters)
