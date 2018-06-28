@@ -289,7 +289,42 @@ VALUES (@0, @1, @2)
 @2 = "John"
 ```
 
-*(TODO Add INSERT multiple values)*
+In order to perform an `INSERT` SQL statement with multiple rows of data at once, we would write:
+
+```csharp
+var users = new[]
+{
+	new User(Name: "John", Age: 10, AddressId: 1),
+	new User(Name: "Jane", Age: 20, AddressId: 2),
+	new User(Name: "Smith", Age: 30, AddressId: 3),
+};
+
+var parameters = users
+	.Select(u => new object[] { u.Age, u.AddressId, u.Name })
+	.ToArray();
+
+var query = builder
+	.InsertMultiple<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", parameters)
+	.ToSqlQuery();
+```
+
+which would create an SqlQuery like this:
+
+```sql
+INSERT INTO [User] ([User].[Age], [User].[AddressId], [User].[Name])
+VALUES (@0, @1, @2), (@3, @4, @5), (@6, @7, @8)
+```
+```sql
+@0 = 10
+@1 = 1
+@2 = "John"
+@3 = 20
+@4 = 2
+@5 = "Jane"
+@6 = 30
+@7 = 3
+@8 = "Smith"
+```
 
 For the `UPDATE` statement, it's quite similar:
 
