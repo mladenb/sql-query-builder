@@ -155,30 +155,31 @@ has generated for us. But we can also use our favorite ORM solution instead.
 
 ## Reusing queries
 
-If we want to create a simple SQL query (in the example below: `baseQuery`), and
-later reuse it, to construct more complex queries (`joinQuery`), we could write
-something like this:
+If we want to create a simple SQL query and reuse it to construct more complex new queries,
+we could do it easily, writing something like this:
 
 ```csharp
 var name = "John";
 var userGroupIds = new[] { 1, 2, 3 };
 
-var baseQuery = builder
+var allUsersQuery = builder
 	.From<User>()
-	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 	.SelectAll();
 
-var joinQuery = baseQuery
+var usersByNameQuery = allUsersQuery
+	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name);
+
+var usersByNameExtendedQuery = usersByNameQuery
 	.InnerJoin<Address>((user, address) => $"{user.AddressId} = {address.Id}")
 	.InnerJoin<UserGroup>((user, address, userGroup) => $"{user.UserGroupId} = {userGroup.Id}")
 	.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", userGroupIds)
 	.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-var baseSqlQuery = baseQuery.ToSqlQuery();
-var joinSqlQuery = joinQuery.ToSqlQuery();
+var usersByNameSqlQuery = usersByNameQuery.ToSqlQuery();
+var usersByNameExtendedSqlQuery = usersByNameExtendedQuery.ToSqlQuery();
 ```
 
-we would end up with 2 SQL queries. The first one, `baseSqlQuery`, would have a Command:
+we would end up with 2 SQL queries. The first one, `usersByNameSqlQuery`, would have a Command:
 
 ```sql
 SELECT *
@@ -192,7 +193,7 @@ and its Parameters set to:
 @0 = "John"
 ```
 
-The second SQL query, `joinSqlQuery`, would have Command/Parameters properties set to:
+The second SQL query, `usersByNameExtendedSqlQuery`, would have Command/Parameters properties set to:
 
 ```sql
 SELECT [User].[Id], [User].[Name], [User].[Age]
@@ -208,8 +209,8 @@ WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1,@2,@
 @3 = 3
 ```
 
-Note that, in the `joinSqlQuery`, the first "`SELECT *`" got replaced with the second
-"`SELECT [User].[Id]...`", and the `WHERE` clauses got merged.
+Note that, in the `usersByNameExtendedSqlQuery`, the first "`SELECT *`" got replaced with the second
+"`SELECT [User].[Id]...`", and all the `WHERE` clauses got merged.
 
 ## A couple of more complex queries
 
