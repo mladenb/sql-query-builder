@@ -132,7 +132,7 @@ properties used and will map them to the appropriate tables/columns of the
 underlying SQL database. The default convention is to use the same naming for the
 C# classes and SQL tables, as well as the same naming for the C# properties on
 those classes and SQL columns of those tables. We can, of course, customize this
-mapping by [providing our own mapper implementations](#custom-table-column-names-mapping).
+mapping by providing our own mapper implementations (see section "Custom table/column names mapping").
 
 Once we have our query built, we can use it, for example, directly using
 [`System.Data.SqlClient.SqlConnection`](https://github.com/dotnet/corefx/blob/master/src/System.Data.SqlClient/src/System/Data/SqlClient/SqlConnection.cs), like this:
@@ -361,7 +361,6 @@ parameters from a zero-based index.
 
 That's why, in the previous query in the `Where()` method, we didn't use the index "`@2`"
 for the user's name placeholder, but we rather used the parameter with index "`@0`".
-
 
 ## Custom table/column names mapping
 
