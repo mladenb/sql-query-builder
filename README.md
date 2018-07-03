@@ -101,8 +101,7 @@ And if we extend that query, by adding a filter to our result set, using a `WHER
 var name = "John";
 
 var newQuery = query
-	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
-	.ToSqlQuery();
+	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name);
 
 var newSql = newQuery.ToSqlQuery();
 ```
@@ -133,7 +132,7 @@ properties used and will map them to the appropriate tables/columns of the
 underlying SQL database. The default convention is to use the same naming for the
 C# classes and SQL tables, as well as the same naming for the C# properties on
 those classes and SQL columns of those tables. We can, of course, customize this
-mapping by [providing our own mapper implementations](#mapping-table-column-names).
+mapping by [providing our own mapper implementations](#custom-table-column-names-mapping).
 
 Once we have our query built, we can use it, for example, directly using
 [`System.Data.SqlClient.SqlConnection`](https://github.com/dotnet/corefx/blob/master/src/System.Data.SqlClient/src/System/Data/SqlClient/SqlConnection.cs), like this:
@@ -337,30 +336,6 @@ var age = 10;
 var addressId = 1;
 var name = "John";
 
-var updateSql = builder
-	.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1, {user.Name} = @2", age, addressId, name)
-	.ToSqlQuery();
-```
-
-which will produce an SqlQuery like:
-
-```sql
-UPDATE [User]
-SET [User].[Age] = @0, [User].[AddressId] = @1, [User].[Name] = @2
-```
-```sql
-@0 = 10
-@1 = 1
-@2 = "John"
-```
-
-Adding a `WHERE` statement:
-
-```csharp
-var age = 10;
-var addressId = 1;
-var name = "John";
-
 var updateByNameSql = builder
 	.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1", age, addressId)
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
@@ -388,7 +363,7 @@ That's why, in the previous query in the `Where()` method, we didn't use the ind
 for the user's name placeholder, but we rather used the parameter with index "`@0`".
 
 
-## Mapping table/column names
+## Custom table/column names mapping
 
 If we have a scenario where our table/column names are not exactly "one-to-one" mapped to our classes/properties, we can specify our custom table/column mappers, when creating a new instance of an SqlQueryBuilder.
 
