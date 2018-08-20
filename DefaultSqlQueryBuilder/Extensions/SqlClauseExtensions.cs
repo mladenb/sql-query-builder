@@ -63,10 +63,11 @@ namespace DefaultSqlQueryBuilder.Extensions
 				.Cast<WhereSqlClause>()
 				.ToArray();
 
-			if (removableWhereClauses.Any())
+			if (removableWhereClauses.Count() > 1)
 			{
+				int lastWhereClause = clauses.FindLastIndex(clause => clause is WhereSqlClause);
+				clauses[lastWhereClause] = removableWhereClauses.Aggregate(MergeWhere);
 				clauses.RemoveAll(removableWhereClauses.Contains);
-				clauses.Add(removableWhereClauses.Aggregate(MergeWhere));
 			}
 
 			return clauses;
