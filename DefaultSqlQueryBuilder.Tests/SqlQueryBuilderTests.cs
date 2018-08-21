@@ -58,7 +58,7 @@ namespace DefaultSqlQueryBuilder.Tests
 		public void SelectWithJoinTest()
 		{
 			const string name = "John";
-			var validUserGroupIds = new[] { 1, 2, 3 };
+			var validUserGroupIds = new[] {1, 2, 3};
 
 			var baseQuery = CreateSqlQueryBuilder()
 				.From<User>()
@@ -91,7 +91,7 @@ namespace DefaultSqlQueryBuilder.Tests
 		public void SelectWithMultipleJoinsAndWheresTest()
 		{
 			const string name = "John";
-			var validUserGroupIds = new[] { 1, 2, 3 };
+			var validUserGroupIds = new[] {1, 2, 3};
 
 			var baseQuery = CreateSqlQueryBuilder()
 				.From<User>()
@@ -170,7 +170,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				},
 			};
 
-			var parameters = users.Select(u => new object[] { u.Age, u.AddressId, u.Name }).ToArray();
+			var parameters = users.Select(u => new object[] {u.Age, u.AddressId, u.Name}).ToArray();
 
 			var query = CreateSqlQueryBuilder()
 				.InsertMultiple<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", parameters)
@@ -293,7 +293,8 @@ namespace DefaultSqlQueryBuilder.Tests
 			const string name = "John";
 
 			var customInsertQuery = CreateSqlQueryBuilder()
-				.Custom<User>(u => $"INSERT INTO {u} ({u.Name}, {u.Age}, {u.AddressId}) OUTPUT INSERTED.Id VALUES (@0, @1, @2)", name, age, addressId)
+				.Custom<User>(u => $"INSERT INTO {u} ({u.Name}, {u.Age}, {u.AddressId}) OUTPUT INSERTED.Id VALUES (@0, @1, @2)",
+					name, age, addressId)
 				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
@@ -327,24 +328,52 @@ namespace DefaultSqlQueryBuilder.Tests
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(0, query.Parameters.Length);
 		}
-	}
 
-	internal class User
-	{
-		public int Id { get; set; }
-		public int AddressId { get; set; }
-		public int UserGroupId { get; set; }
-		public string Name { get; set; }
-		public int Age { get; set; }
-	}
+		[TestMethod]
+		public void SelectWithWhereAndOrderByRegressionTest()
+		{
+			const string name = "John";
+			const int age = 10;
 
-	internal class Address
-	{
-		public int Id { get; set; }
-	}
+			var query = CreateSqlQueryBuilder()
+				.From<User>()
+				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
+				.Where(user => $"{user.Age} = @0", age)
+				.OrderBy(user => $"{user.Age}")
+				.SelectAll()
+				.ToSqlQuery();
 
-	internal class UserGroup
-	{
-		public int Id { get; set; }
+			var expectedResult = string.Join("\n", new[]
+			{
+				"SELECT *",
+				"FROM [User]",
+				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[Age] = @1))",
+				"ORDER BY [User].[Age]"
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(2, query.Parameters.Length);
+			Assert.AreEqual(name, query.Parameters.First());
+			Assert.AreEqual(age, query.Parameters.Last());
+		}
+
+		internal class User
+		{
+			public int Id { get; set; }
+			public int AddressId { get; set; }
+			public int UserGroupId { get; set; }
+			public string Name { get; set; }
+			public int Age { get; set; }
+		}
+
+		internal class Address
+		{
+			public int Id { get; set; }
+		}
+
+		internal class UserGroup
+		{
+			public int Id { get; set; }
+		}
 	}
 }
