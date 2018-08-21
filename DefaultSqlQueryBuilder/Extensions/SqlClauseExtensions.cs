@@ -63,9 +63,9 @@ namespace DefaultSqlQueryBuilder.Extensions
 				.Cast<WhereSqlClause>()
 				.ToArray();
 
-			if (removableWhereClauses.Count() > 1)
+			if (removableWhereClauses.Length > 1)
 			{
-				int lastWhereClause = clauses.FindLastIndex(clause => clause is WhereSqlClause);
+				var lastWhereClause = clauses.IndexOf(removableWhereClauses.Last());
 				clauses[lastWhereClause] = removableWhereClauses.Aggregate(MergeWhere);
 				clauses.RemoveAll(removableWhereClauses.Contains);
 			}
