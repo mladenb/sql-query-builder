@@ -55,6 +55,31 @@ namespace DefaultSqlQueryBuilder.Tests
 		}
 
 		[TestMethod]
+		public void SelectWithGroupByTest()
+		{
+			const string name = "John";
+
+			var query = CreateSqlQueryBuilder()
+				.From<User>()
+				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
+				.GroupBy(user => $"{user.UserGroupId}")
+				.Select(user => $"AVG({user.Age})")
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"SELECT AVG([User].[Age])",
+				"FROM [User]",
+				"WHERE ([User].[Name] LIKE '%' + @0 + '%')",
+				"GROUP BY [User].[UserGroupId]",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(1, query.Parameters.Length);
+			Assert.AreEqual(name, query.Parameters.First());
+		}
+
+		[TestMethod]
 		public void SelectWithJoinTest()
 		{
 			const string name = "John";
