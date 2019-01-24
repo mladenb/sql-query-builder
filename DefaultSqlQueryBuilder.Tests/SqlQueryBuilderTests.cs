@@ -32,6 +32,42 @@ namespace DefaultSqlQueryBuilder.Tests
 		}
 
 		[TestMethod]
+		public void SelectWithTopWithoutWhereTest()
+		{
+			var query = CreateSqlQueryBuilder()
+				.From<User>()
+				.Select(user => $"{user.Age}", 10)
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"SELECT TOP 10 [User].[Age]",
+				"FROM [User]",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(0, query.Parameters.Length);
+		}
+
+		[TestMethod]
+		public void SelectAllWithTopWithoutWhereTest()
+		{
+			var query = CreateSqlQueryBuilder()
+				.From<User>()
+				.SelectAll(10)
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"SELECT TOP 10 *",
+				"FROM [User]",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(0, query.Parameters.Length);
+		}
+
+		[TestMethod]
 		public void SelectWithWhereTest()
 		{
 			const string name = "John";

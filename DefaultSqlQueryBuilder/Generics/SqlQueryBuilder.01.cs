@@ -36,14 +36,14 @@ namespace DefaultSqlQueryBuilder.Generics
 			});
 		}
 
-		public SqlQueryBuilder<T> Select(Expression<Func<T, string>> stringExpression)
+		public SqlQueryBuilder<T> Select(Expression<Func<T, string>> stringExpression, int? top = null)
 		{
-			return Update(sqlBuilder => sqlBuilder.AddSelect(ParseStringFormatExpression(stringExpression.Body)));
+			return Update(sqlBuilder => sqlBuilder.AddSelect(ParseStringFormatExpression(stringExpression.Body), top));
 		}
 
-		public SqlQueryBuilder<T> SelectAll()
+		public SqlQueryBuilder<T> SelectAll(int? top = null)
 		{
-			return Update(sqlBuilder => sqlBuilder.AddSelect("*"));
+			return Update(sqlBuilder => sqlBuilder.AddSelect("*", top));
 		}
 
 		public SqlQueryBuilder<T> GroupBy(Expression<Func<T, string>> stringExpression)

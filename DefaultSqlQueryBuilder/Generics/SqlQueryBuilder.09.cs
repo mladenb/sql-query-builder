@@ -36,14 +36,14 @@ namespace DefaultSqlQueryBuilder.Generics
 			});
 		}
 
-		public SqlQueryBuilder<T1, T2, T3, T4, T5, T6, T7, T8, T9> Select(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, string>> stringExpression)
+		public SqlQueryBuilder<T1, T2, T3, T4, T5, T6, T7, T8, T9> Select(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, string>> stringExpression, int? top = null)
 		{
-			return Update(sqlBuilder => sqlBuilder.AddSelect(ParseStringFormatExpression(stringExpression.Body)));
+			return Update(sqlBuilder => sqlBuilder.AddSelect(ParseStringFormatExpression(stringExpression.Body), top));
 		}
 
-		public SqlQueryBuilder<T1, T2, T3, T4, T5, T6, T7, T8, T9> SelectAll()
+		public SqlQueryBuilder<T1, T2, T3, T4, T5, T6, T7, T8, T9> SelectAll(int? top = null)
 		{
-			return Update(sqlBuilder => sqlBuilder.AddSelect("*"));
+			return Update(sqlBuilder => sqlBuilder.AddSelect("*", top));
 		}
 
 		public SqlQueryBuilder<T1, T2, T3, T4, T5, T6, T7, T8, T9> GroupBy(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, string>> stringExpression)
