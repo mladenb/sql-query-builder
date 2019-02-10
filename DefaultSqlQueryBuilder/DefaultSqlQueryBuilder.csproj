@@ -9,14 +9,15 @@
     <Company />
     <Product>SqlQueryBuilder.Core</Product>
     <Description>A C# library which helps create customized and extensible LINQ-like sql queries more easily.</Description>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <PackageReleaseNotes>Removed SelectAll() as it's really not needed but it complicates the maintenance.</PackageReleaseNotes>
     <Copyright>Copyright 2018</Copyright>
     <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl-3.0.html</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/mladenb/sql-query-builder</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mladenb/sql-query-builder</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>sql query builder linq</PackageTags>
-    <Version>1.1.0</Version>
+    <Version>2.0.0.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
 </Project>
