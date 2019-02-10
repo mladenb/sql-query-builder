@@ -72,7 +72,7 @@ namespace DefaultSqlQueryBuilder.Tests
 		{
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
-				.Select(user => $"{user.Age}", 10)
+				.Select(user => $"TOP 10 {user.Age}")
 				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
@@ -90,7 +90,7 @@ namespace DefaultSqlQueryBuilder.Tests
 		{
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
-				.Select(user => "*", 10)
+				.Select(user => "TOP 10 *")
 				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]

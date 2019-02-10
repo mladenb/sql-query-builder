@@ -36,9 +36,9 @@ namespace DefaultSqlQueryBuilder.Generics
 			});
 		}
 
-		public SqlQueryBuilder<T> Select(Expression<Func<T, string>> stringExpression, int? top = null)
+		public SqlQueryBuilder<T> Select(Expression<Func<T, string>> stringExpression)
 		{
-			return Update(sqlBuilder => sqlBuilder.AddSelect(ParseStringFormatExpression(stringExpression.Body), top));
+			return Update(sqlBuilder => sqlBuilder.AddSelect(ParseStringFormatExpression(stringExpression.Body)));
 		}
 
 		public SqlQueryBuilder<T> GroupBy(Expression<Func<T, string>> stringExpression)

@@ -70,10 +70,10 @@ namespace DefaultSqlQueryBuilder
 			_clauses.Add(new FromSqlClause(TableNameFor<TTable>()));
 		}
 
-		protected void AddSelect(string columns, int? top = null)
+		protected void AddSelect(string columns)
 		{
 			_clauses.RemoveAll(clause => clause is SelectSqlClause);
-			_clauses.Insert(0, new SelectSqlClause(columns, top));
+			_clauses.Insert(0, new SelectSqlClause(columns));
 		}
 
 		protected void AddInsert<TTable>(string columns, object[] parameters)

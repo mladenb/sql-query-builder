@@ -18,9 +18,7 @@ namespace DefaultSqlQueryBuilder.Extensions
 					return new CustomSqlClause($"UPDATE {updateClause.TableName} SET {updateClause.ColumnsWithValues}", updateClause.Parameters);
 
 				case SelectSqlClause selectClause:
-					return selectClause.Top.HasValue
-						? new CustomSqlClause($"SELECT TOP {selectClause.Top} {selectClause.Columns}")
-						: new CustomSqlClause($"SELECT {selectClause.Columns}");
+					return new CustomSqlClause($"SELECT {selectClause.Columns}");
 
 				case OrderBySqlClause orderByClause:
 					return new CustomSqlClause($"ORDER BY {orderByClause.Columns}");
