@@ -18,7 +18,7 @@ namespace DefaultSqlQueryBuilder.Tests
 		{
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
-				.SelectAll()
+				.Select(user => "*")
 				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
@@ -90,7 +90,7 @@ namespace DefaultSqlQueryBuilder.Tests
 		{
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
-				.SelectAll(10)
+				.Select(user => "*", 10)
 				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
@@ -111,7 +111,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
-				.SelectAll()
+				.Select(user => "*")
 				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
@@ -160,7 +160,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var baseQuery = CreateSqlQueryBuilder()
 				.From<User>()
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
-				.SelectAll();
+				.Select(user => "*");
 
 			var joinQuery = baseQuery
 				.InnerJoin<Address>((user, address) => $"{user.AddressId} = {address.Id}")
@@ -193,7 +193,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var baseQuery = CreateSqlQueryBuilder()
 				.From<User>()
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
-				.SelectAll();
+				.Select(user => "*");
 
 			var joinQuery = baseQuery
 				.InnerJoin<Address>((user, address) => $"{user.AddressId} = {address.Id}")
@@ -437,7 +437,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.Where(user => $"{user.Age} = @0", age)
 				.OrderBy(user => $"{user.Age}")
-				.SelectAll()
+				.Select(user => "*")
 				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n", new[]
