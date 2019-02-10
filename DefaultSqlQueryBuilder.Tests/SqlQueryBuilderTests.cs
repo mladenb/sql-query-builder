@@ -32,6 +32,42 @@ namespace DefaultSqlQueryBuilder.Tests
 		}
 
 		[TestMethod]
+		public void SelectWithStringFormatTest()
+		{
+			var query = CreateSqlQueryBuilder()
+				.From<User>()
+				.Select(user => string.Format("TOP 10 *"))
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"SELECT TOP 10 *",
+				"FROM [User]",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(0, query.Parameters.Length);
+		}
+
+		[TestMethod]
+		public void SelectWithCoalesceTest()
+		{
+			var query = CreateSqlQueryBuilder()
+				.From<User>()
+				.Select(user => $"TOP 10 *")
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n", new[]
+			{
+				"SELECT TOP 10 *",
+				"FROM [User]",
+			});
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.AreEqual(0, query.Parameters.Length);
+		}
+
+		[TestMethod]
 		public void SelectWithTopWithoutWhereTest()
 		{
 			var query = CreateSqlQueryBuilder()

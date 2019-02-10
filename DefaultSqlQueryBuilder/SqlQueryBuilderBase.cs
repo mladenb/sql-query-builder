@@ -123,10 +123,8 @@ namespace DefaultSqlQueryBuilder
 
 		protected string ParseStringFormatExpression(Expression expression)
 		{
-			if (expression.NodeType == ExpressionType.Constant && expression.Type == typeof(string))
-			{
-				return (string)((ConstantExpression) expression).Value;
-			}
+			var simpleString = GetSimpleString(expression);
+			if (simpleString != null) return simpleString;
 
 			var stringFormatExpression = GetStringFormatMethodCallExpression(expression);
 
@@ -141,6 +139,25 @@ namespace DefaultSqlQueryBuilder
 				.Select(ColumnNameOrTableNameFor);
 
 			return string.Format(stringPattern, mappedArguments.Cast<object>().ToArray());
+		}
+
+		private static string GetSimpleString(Expression expression)
+		{
+			if (expression.Type != typeof(string)) return null;
+
+			if (expression.NodeType == ExpressionType.Constant) return (string)((ConstantExpression)expression).Value;
+
+			if (expression.NodeType == ExpressionType.Coalesce)
+			{
+				var binaryExpression = (BinaryExpression)expression;
+				var coalesced = Expression.Coalesce(binaryExpression.Left, binaryExpression.Right);
+				var lambda = Expression.Lambda<Func<string>>(coalesced);
+				var compiled = lambda.Compile();
+
+				return compiled.Invoke();
+			}
+
+			return null;
 		}
 
 		private static List<Expression> ToExpressionList(Expression x)
