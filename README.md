@@ -428,3 +428,14 @@ var columnNameResolver = new NPocoColumnNameResolver(db);
 var builder = new SqlQueryBuilder(tableNameResolver, columnNameResolver);
 ```
 and we can reuse all the examples given here, in this document, the same way.
+
+## Custom table name
+
+You can change to specific table name without change class name using **TableName** attribute
+```csharp
+[TableName("Users")]
+public class User
+{
+	...
+}
+```
