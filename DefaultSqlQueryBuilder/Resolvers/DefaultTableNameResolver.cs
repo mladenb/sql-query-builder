@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace DefaultSqlQueryBuilder.Resolvers
 {
@@ -8,13 +9,10 @@ namespace DefaultSqlQueryBuilder.Resolvers
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
 
-            var customAttribute = type.GetCustomAttributes(typeof(TableNameAttribute), true);
-            if (customAttribute.Length > 0)
-            {
-                var tableNameAttribute = customAttribute[0] as TableNameAttribute;
+            var tableNameAttribute = type.GetCustomAttribute(typeof(TableNameAttribute), true) as TableNameAttribute;
+            if(tableNameAttribute != null)
                 return $"[{tableNameAttribute.TableName}]";
-            }
-
+            
             return $"[{type.Name}]";
         }
     }

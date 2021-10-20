@@ -10,6 +10,9 @@ namespace DefaultSqlQueryBuilder
     {
         public TableNameAttribute(string tableName)
         {
+            if (string.IsNullOrWhiteSpace(tableName))
+                throw new ArgumentException("Cannot be empty string", nameof(tableName));
+
             TableName = tableName;
         }
 
