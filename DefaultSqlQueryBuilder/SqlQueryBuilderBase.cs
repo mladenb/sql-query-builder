@@ -1,4 +1,5 @@
 using DefaultSqlQueryBuilder.Clauses;
+using DefaultSqlQueryBuilder.Contracts;
 using DefaultSqlQueryBuilder.Extensions;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,17 @@ namespace DefaultSqlQueryBuilder
 		public IReadOnlyCollection<SqlClause> Clauses => _clauses.ToArray();
 
 		private readonly List<SqlClause> _clauses;
+
+		public SqlQuery ToSqlQuery(ISqlSyntax syntax)
+		{
+			var sqls = _clauses
+				.ConsolidateWhereClauses()
+				.Select(c => syntax.ToSql(c));
+
+			var result = sqls.Aggregate((current, sql) => current.Append(sql.Sql, sql.Parameters));
+
+			return new SqlQuery(result.Sql, result.Parameters);
+		}
 
 		protected string TableNameFor<T>()
 		{
