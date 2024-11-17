@@ -18,7 +18,7 @@ namespace DefaultSqlQueryBuilder.Tools.GenericsGenerator
 
 			foreach (var arg in args)
 			{
-				Console.Write($"How much generics to create for the file '{arg}': ");
+				Console.Write($"How many generics to create for the file '{arg}': ");
 				var howMuch = int.Parse(Console.ReadLine());
 
 				var content = File.ReadAllText(arg);
