@@ -15,7 +15,7 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 				WhereSqlClause whereClause => new SqlQuery($"WHERE ({whereClause.WhereConditions})", whereClause.Parameters),
 				UpdateSqlClause updateClause => new SqlQuery($"UPDATE {updateClause.TableName} SET {updateClause.ColumnsWithValues}", updateClause.Parameters),
 				SelectSqlClause selectClause => new SqlQuery($"SELECT {selectClause.Columns}"),
-				OrderBySqlClause orderByClause => new SqlQuery($"ORDER BY {orderByClause.Columns}"),
+				OrderBySqlClause orderByClause => new SqlQuery($"ORDER BY {orderByClause.Columns}{GetOrderByDirection(orderByClause)}"),
 				LeftJoinSqlClause leftJoinClause => new SqlQuery($"LEFT JOIN {leftJoinClause.TableName} ON {leftJoinClause.OnConditions}", leftJoinClause.Parameters),
 				InsertSqlClause insertClause => new SqlQuery($"INSERT INTO {insertClause.TableName} ({insertClause.Columns}) VALUES ({ToPlaceholdersCsv(insertClause.Parameters)})", insertClause.Parameters),
 				InsertMultipleSqlClause insertMultipleClause => CreateInsertMultiple(insertMultipleClause),
@@ -25,6 +25,13 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 				DeleteSqlClause deleteClause => new SqlQuery($"DELETE FROM {deleteClause.TableName}"),
 				_ => base.ToSqlQuery(clause),
 			};
+		}
+
+		private string GetOrderByDirection(OrderBySqlClause clause)
+		{
+			return clause.OrderingDirection != OrderingDirection.Ascending
+				? " DESC"
+				: "";
 		}
 
 		private SqlQuery CreateInsertMultiple(InsertMultipleSqlClause insertMultipleClause)

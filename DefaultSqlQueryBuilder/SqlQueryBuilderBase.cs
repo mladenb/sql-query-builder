@@ -123,9 +123,9 @@ namespace DefaultSqlQueryBuilder
 			_clauses.Add(new GroupBySqlClause(columns));
 		}
 
-		protected void AddOrderBy(string columns)
+		protected void AddOrderBy(string columns, OrderingDirection orderingDirection)
 		{
-			_clauses.Add(new OrderBySqlClause(columns));
+			_clauses.Add(new OrderBySqlClause(columns, orderingDirection));
 		}
 
 		protected void AddCustom(string sql, object[] parameters)

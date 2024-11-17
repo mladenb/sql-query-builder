@@ -1,3 +1,4 @@
+using DefaultSqlQueryBuilder.Contracts;
 using DefaultSqlQueryBuilder.SqlSyntaxes;
 using DefaultSqlQueryBuilder.Tests.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -425,6 +426,33 @@ namespace DefaultSqlQueryBuilder.Tests
 				"FROM [User]",
 				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[Age] = @1))",
 				"ORDER BY [User].[Age]"
+			);
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
+			Assert.AreEqual(2, query.Parameters.Length);
+			Assert.AreEqual(name, query.Parameters.First());
+			Assert.AreEqual(age, query.Parameters.Last());
+		}
+
+		[TestMethod]
+		public void SelectWithWhereAndOrderByDescendingTest()
+		{
+			const string name = "John";
+			const int age = 10;
+
+			var query = CreateSqlQueryBuilder()
+				.From<User>()
+				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
+				.Where(user => $"{user.Age} = @0", age)
+				.OrderBy(user => $"{user.Age}", OrderingDirection.Descending)
+				.Select(user => "*")
+				.ToSqlQuery(MsSqlSyntax);
+
+			var expectedResult = string.Join("\n",
+				"SELECT *",
+				"FROM [User]",
+				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[Age] = @1))",
+				"ORDER BY [User].[Age] DESC"
 			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Sql);

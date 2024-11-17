@@ -1,3 +1,4 @@
+using DefaultSqlQueryBuilder.Contracts;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -46,9 +47,9 @@ namespace DefaultSqlQueryBuilder.Generics
 			return Update(sqlBuilder => sqlBuilder.AddGroupBy(ParseStringFormatExpression(stringExpression.Body)));
 		}
 
-		public SqlQueryBuilder<T> OrderBy(Expression<Func<T, string>> stringExpression)
+		public SqlQueryBuilder<T> OrderBy(Expression<Func<T, string>> stringExpression, OrderingDirection orderingDirection = OrderingDirection.Ascending)
 		{
-			return Update(sqlBuilder => sqlBuilder.AddOrderBy(ParseStringFormatExpression(stringExpression.Body)));
+			return Update(sqlBuilder => sqlBuilder.AddOrderBy(ParseStringFormatExpression(stringExpression.Body), orderingDirection));
 		}
 
 		public SqlQueryBuilder<T> Custom(Expression<Func<T, string>> stringExpression, params object[] parameters)
