@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace DefaultSqlQueryBuilder
 {
-	public abstract class SqlQueryBuilderBase
+	public class SqlQueryBuilderBase
 	{
 		protected SqlQueryBuilderBase(ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver, IEnumerable<ISqlClause>? clauses = null)
 		{
@@ -32,7 +32,7 @@ namespace DefaultSqlQueryBuilder
 		{
 			var sqls = _clauses
 				.ConsolidateWhereClauses()
-				.Select(c => syntax.ToSql(c));
+				.Select(c => syntax.ToSqlQuery(c));
 
 			var result = sqls.Aggregate((current, sql) => current.Append(sql.Sql, sql.Parameters));
 
@@ -115,7 +115,7 @@ namespace DefaultSqlQueryBuilder
 
 		protected void AddFirstCustom(string sql, object[] parameters)
 		{
-			_clauses.Insert(0, new SqlClause(sql, parameters));
+			_clauses.Insert(0, new CustomSqlClause(sql, parameters));
 		}
 
 		protected void AddGroupBy(string columns)
@@ -130,7 +130,7 @@ namespace DefaultSqlQueryBuilder
 
 		protected void AddCustom(string sql, object[] parameters)
 		{
-			_clauses.Add(new SqlClause(sql, parameters));
+			_clauses.Add(new CustomSqlClause(sql, parameters));
 		}
 
 		protected string ParseStringFormatExpression(Expression expression)

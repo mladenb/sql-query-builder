@@ -24,7 +24,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"FROM [User]"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(0, query.Parameters.Length);
 		}
 
@@ -41,7 +41,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"FROM [User]"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(0, query.Parameters.Length);
 		}
 
@@ -58,7 +58,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"FROM [User]"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(0, query.Parameters.Length);
 		}
 
@@ -75,7 +75,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"FROM [User]"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(0, query.Parameters.Length);
 		}
 
@@ -92,7 +92,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"FROM [User]"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(0, query.Parameters.Length);
 		}
 
@@ -113,7 +113,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"WHERE ([User].[Name] LIKE '%' + @0 + '%')"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(1, query.Parameters.Length);
 			Assert.AreEqual(name, query.Parameters.First());
 		}
@@ -137,7 +137,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"GROUP BY [User].[UserGroupId]"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(1, query.Parameters.Length);
 			Assert.AreEqual(name, query.Parameters.First());
 		}
@@ -169,7 +169,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1)))"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(2, query.Parameters.Length);
 			Assert.AreEqual(name, query.Parameters.First());
 		}
@@ -202,7 +202,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"WHERE ((([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] = 1)) AND ([User].[UserGroupId] IN (@1)))"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(2, query.Parameters.Length);
 			Assert.AreEqual(name, query.Parameters.First());
 		}
@@ -223,7 +223,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"VALUES (@0, @1, @2)"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(3, query.Parameters.Length);
 			Assert.AreEqual(age, query.Parameters[0]);
 			Assert.AreEqual(addressId, query.Parameters[1]);
@@ -266,7 +266,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"VALUES (@0, @1, @2), (@3, @4, @5), (@6, @7, @8)"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(9, query.Parameters.Length);
 
 			Assert.AreEqual(parameters[0][0], query.Parameters[0]);
@@ -298,7 +298,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"SET [User].[Age] = @0, [User].[AddressId] = @1, [User].[Name] = @2"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(3, query.Parameters.Length);
 			Assert.AreEqual(age, query.Parameters[0]);
 			Assert.AreEqual(addressId, query.Parameters[1]);
@@ -323,7 +323,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"WHERE ([User].[Name] LIKE '%' + @2 + '%')"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(3, query.Parameters.Length);
 			Assert.AreEqual(age, query.Parameters[0]);
 			Assert.AreEqual(addressId, query.Parameters[1]);
@@ -339,7 +339,7 @@ namespace DefaultSqlQueryBuilder.Tests
 
 			var expectedResult = "DELETE FROM [User]";
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(0, query.Parameters.Length);
 		}
 
@@ -358,7 +358,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"WHERE ([User].[Name] LIKE '%' + @0 + '%')"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(1, query.Parameters.Length);
 			Assert.AreEqual(name, query.Parameters[0]);
 		}
@@ -381,7 +381,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"VALUES (@0, @1, @2)"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, customInsertQuery.Command);
+			Assert.That.SqlsAreEqual(expectedResult, customInsertQuery.Sql);
 			Assert.AreEqual(3, customInsertQuery.Parameters.Length);
 			Assert.AreEqual(name, customInsertQuery.Parameters[0]);
 			Assert.AreEqual(age, customInsertQuery.Parameters[1]);
@@ -401,7 +401,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"FROM [User]"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(0, query.Parameters.Length);
 		}
 
@@ -426,7 +426,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				"ORDER BY [User].[Age]"
 			);
 
-			Assert.That.SqlsAreEqual(expectedResult, query.Command);
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
 			Assert.AreEqual(2, query.Parameters.Length);
 			Assert.AreEqual(name, query.Parameters.First());
 			Assert.AreEqual(age, query.Parameters.Last());
