@@ -20,12 +20,12 @@ namespace DefaultSqlQueryBuilder.Clauses
 		private readonly string _sql2;
 		private readonly object[] _parameters2;
 
-		public CustomSqlClause Merge(string mergeFormat)
+		public SqlClause Merge(string mergeFormat)
 		{
 			var newSql2 = Regex.Replace(_sql2, Pattern, ShiftParams);
 			var newParams = _parameters1.Concat(_parameters2).ToArray();
 
-			return new CustomSqlClause(string.Format(mergeFormat, _sql1, newSql2), newParams);
+			return new SqlClause(string.Format(mergeFormat, _sql1, newSql2), newParams);
 		}
 
 		private string ShiftParams(Match match)

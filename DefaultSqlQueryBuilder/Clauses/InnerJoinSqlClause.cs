@@ -1,6 +1,8 @@
+using DefaultSqlQueryBuilder.Contracts;
+
 namespace DefaultSqlQueryBuilder.Clauses
 {
-	public class InnerJoinSqlClause : SqlClause
+	public class InnerJoinSqlClause : ISqlClause
 	{
 		public string TableName { get; }
 		public string OnConditions { get; }

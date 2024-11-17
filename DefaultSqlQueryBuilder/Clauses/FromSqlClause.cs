@@ -1,6 +1,8 @@
+using DefaultSqlQueryBuilder.Contracts;
+
 namespace DefaultSqlQueryBuilder.Clauses
 {
-	public class FromSqlClause : SqlClause
+	public class FromSqlClause : ISqlClause
 	{
 		public string TableName { get; }
 

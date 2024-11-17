@@ -9,46 +9,46 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 {
 	public class MsSqlSyntax : ISqlSyntax
 	{
-		public CustomSqlClause ToSql(SqlClause clause)
+		public SqlClause ToSql(ISqlClause clause)
 		{
 			switch (clause)
 			{
 				case WhereSqlClause whereClause:
-					return new CustomSqlClause($"WHERE ({whereClause.WhereConditions})", whereClause.Parameters);
+					return new SqlClause($"WHERE ({whereClause.WhereConditions})", whereClause.Parameters);
 
 				case UpdateSqlClause updateClause:
-					return new CustomSqlClause($"UPDATE {updateClause.TableName} SET {updateClause.ColumnsWithValues}", updateClause.Parameters);
+					return new SqlClause($"UPDATE {updateClause.TableName} SET {updateClause.ColumnsWithValues}", updateClause.Parameters);
 
 				case SelectSqlClause selectClause:
-					return new CustomSqlClause($"SELECT {selectClause.Columns}");
+					return new SqlClause($"SELECT {selectClause.Columns}");
 
 				case OrderBySqlClause orderByClause:
-					return new CustomSqlClause($"ORDER BY {orderByClause.Columns}");
+					return new SqlClause($"ORDER BY {orderByClause.Columns}");
 
 				case LeftJoinSqlClause leftJoinClause:
-					return new CustomSqlClause($"LEFT JOIN {leftJoinClause.TableName} ON {leftJoinClause.OnConditions}", leftJoinClause.Parameters);
+					return new SqlClause($"LEFT JOIN {leftJoinClause.TableName} ON {leftJoinClause.OnConditions}", leftJoinClause.Parameters);
 
 				case InsertSqlClause insertClause:
-					return new CustomSqlClause($"INSERT INTO {insertClause.TableName} ({insertClause.Columns}) VALUES ({ToPlaceholdersCsv(insertClause.Parameters)})", insertClause.Parameters);
+					return new SqlClause($"INSERT INTO {insertClause.TableName} ({insertClause.Columns}) VALUES ({ToPlaceholdersCsv(insertClause.Parameters)})", insertClause.Parameters);
 
 				case InsertMultipleSqlClause insertMultipleClause:
 					var monkeys = GetInsertMultipleMonkeys(insertMultipleClause.Parameters);
 					var values = GetInsertMultipleValues(insertMultipleClause.Parameters);
-					return new CustomSqlClause($"INSERT INTO {insertMultipleClause.TableName} ({insertMultipleClause.Columns}) VALUES {monkeys}", values);
+					return new SqlClause($"INSERT INTO {insertMultipleClause.TableName} ({insertMultipleClause.Columns}) VALUES {monkeys}", values);
 
 				case InnerJoinSqlClause innerJoinClause:
-					return new CustomSqlClause($"INNER JOIN {innerJoinClause.TableName} ON {innerJoinClause.OnConditions}", innerJoinClause.Parameters);
+					return new SqlClause($"INNER JOIN {innerJoinClause.TableName} ON {innerJoinClause.OnConditions}", innerJoinClause.Parameters);
 
 				case GroupBySqlClause groupByClause:
-					return new CustomSqlClause($"GROUP BY {groupByClause.Columns}");
+					return new SqlClause($"GROUP BY {groupByClause.Columns}");
 
 				case FromSqlClause fromClause:
-					return new CustomSqlClause($"FROM {fromClause.TableName}");
+					return new SqlClause($"FROM {fromClause.TableName}");
 
 				case DeleteSqlClause deleteClause:
-					return new CustomSqlClause($"DELETE FROM {deleteClause.TableName}");
+					return new SqlClause($"DELETE FROM {deleteClause.TableName}");
 
-				case CustomSqlClause customClause:
+				case SqlClause customClause:
 					return customClause;
 			}
 

@@ -4,6 +4,6 @@ namespace DefaultSqlQueryBuilder.Contracts
 {
 	public interface ISqlSyntax
 	{
-		CustomSqlClause ToSql(SqlClause clause);
+		SqlClause ToSql(ISqlClause clause);
 	}
 }

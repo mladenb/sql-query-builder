@@ -1,6 +1,8 @@
+using DefaultSqlQueryBuilder.Contracts;
+
 namespace DefaultSqlQueryBuilder.Clauses
 {
-	public class WhereSqlClause : SqlClause
+	public class WhereSqlClause : ISqlClause
 	{
 		public WhereSqlClause(string whereConditions, object[] parameters)
 		{

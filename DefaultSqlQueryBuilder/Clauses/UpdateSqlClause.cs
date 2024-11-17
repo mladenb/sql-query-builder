@@ -1,6 +1,8 @@
+using DefaultSqlQueryBuilder.Contracts;
+
 namespace DefaultSqlQueryBuilder.Clauses
 {
-	public class UpdateSqlClause : SqlClause
+	public class UpdateSqlClause : ISqlClause
 	{
 		public string TableName { get; }
 		public string ColumnsWithValues { get; }

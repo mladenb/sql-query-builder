@@ -1,9 +1,10 @@
+using DefaultSqlQueryBuilder.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DefaultSqlQueryBuilder.Clauses
 {
-	public class InsertMultipleSqlClause : SqlClause
+	public class InsertMultipleSqlClause : ISqlClause
 	{
 		public string TableName { get; }
 		public string Columns { get; }

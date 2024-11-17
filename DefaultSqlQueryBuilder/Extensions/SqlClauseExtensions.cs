@@ -1,4 +1,5 @@
 ﻿using DefaultSqlQueryBuilder.Clauses;
+using DefaultSqlQueryBuilder.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ namespace DefaultSqlQueryBuilder.Extensions
 {
 	public static class SqlClauseExtensions
 	{
-		public static IEnumerable<SqlClause> ConsolidateWhereClauses(this IEnumerable<SqlClause> sqlClauses)
+		public static IEnumerable<ISqlClause> ConsolidateWhereClauses(this IEnumerable<ISqlClause> sqlClauses)
 		{
 			var clauses = sqlClauses.ToList();
 			var removableWhereClauses = clauses
@@ -33,12 +34,12 @@ namespace DefaultSqlQueryBuilder.Extensions
 			return new WhereSqlClause(newClause.Sql, newClause.Parameters);
 		}
 
-		public static CustomSqlClause Append(this CustomSqlClause source, string sql, params object[] parameters)
+		public static SqlClause Append(this SqlClause source, string sql, params object[] parameters)
 		{
 			var merger = new SqlClauseMerger(source.Sql, source.Parameters, sql, parameters);
 			var newClause = merger.Merge("{0}\n{1}");
 
-			return new CustomSqlClause(newClause.Sql, newClause.Parameters);
+			return new SqlClause(newClause.Sql, newClause.Parameters);
 		}
 	}
 }

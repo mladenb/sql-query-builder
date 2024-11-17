@@ -1,6 +1,8 @@
+using DefaultSqlQueryBuilder.Contracts;
+
 namespace DefaultSqlQueryBuilder.Clauses
 {
-	public class DeleteSqlClause : SqlClause
+	public class DeleteSqlClause : ISqlClause
 	{
 		public string TableName { get; }
 

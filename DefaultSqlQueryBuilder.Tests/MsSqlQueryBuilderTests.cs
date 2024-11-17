@@ -19,11 +19,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => "*")
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT *",
-				"FROM [User]",
-			});
+				"FROM [User]"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(0, query.Parameters.Length);
@@ -37,11 +36,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => string.Format("TOP 10 *"))
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT TOP 10 *",
-				"FROM [User]",
-			});
+				"FROM [User]"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(0, query.Parameters.Length);
@@ -55,11 +53,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => $"TOP 10 *")
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT TOP 10 *",
-				"FROM [User]",
-			});
+				"FROM [User]"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(0, query.Parameters.Length);
@@ -73,11 +70,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => $"TOP 10 {user.Age}")
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT TOP 10 [User].[Age]",
-				"FROM [User]",
-			});
+				"FROM [User]"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(0, query.Parameters.Length);
@@ -91,11 +87,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => "TOP 10 *")
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT TOP 10 *",
-				"FROM [User]",
-			});
+				"FROM [User]"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(0, query.Parameters.Length);
@@ -112,12 +107,11 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => "*")
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT *",
 				"FROM [User]",
-				"WHERE ([User].[Name] LIKE '%' + @0 + '%')",
-			});
+				"WHERE ([User].[Name] LIKE '%' + @0 + '%')"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(1, query.Parameters.Length);
@@ -136,13 +130,12 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => $"AVG({user.Age})")
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT AVG([User].[Age])",
 				"FROM [User]",
 				"WHERE ([User].[Name] LIKE '%' + @0 + '%')",
-				"GROUP BY [User].[UserGroupId]",
-			});
+				"GROUP BY [User].[UserGroupId]"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(1, query.Parameters.Length);
@@ -168,14 +161,13 @@ namespace DefaultSqlQueryBuilder.Tests
 
 			var query = joinQuery.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT [User].[Id], [User].[Name], [User].[Age]",
 				"FROM [User]",
 				"INNER JOIN [Address] ON [User].[AddressId] = [Address].[Id]",
 				"INNER JOIN [UserGroup] ON [User].[UserGroupId] = [UserGroup].[Id]",
-				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1)))",
-			});
+				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1)))"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(2, query.Parameters.Length);
@@ -202,14 +194,13 @@ namespace DefaultSqlQueryBuilder.Tests
 
 			var query = joinQuery.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT [User].[Id], [User].[Name], [User].[Age]",
 				"FROM [User]",
 				"INNER JOIN [Address] ON [User].[AddressId] = [Address].[Id]",
 				"INNER JOIN [UserGroup] ON [User].[UserGroupId] = [UserGroup].[Id]",
-				"WHERE ((([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] = 1)) AND ([User].[UserGroupId] IN (@1)))",
-			});
+				"WHERE ((([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] = 1)) AND ([User].[UserGroupId] IN (@1)))"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(2, query.Parameters.Length);
@@ -227,11 +218,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Insert<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", age, addressId, name)
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"INSERT INTO [User] ([User].[Age], [User].[AddressId], [User].[Name])",
-				"VALUES (@0, @1, @2)",
-			});
+				"VALUES (@0, @1, @2)"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(3, query.Parameters.Length);
@@ -271,11 +261,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.InsertMultiple<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", parameters)
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"INSERT INTO [User] ([User].[Age], [User].[AddressId], [User].[Name])",
-				"VALUES (@0, @1, @2), (@3, @4, @5), (@6, @7, @8)",
-			});
+				"VALUES (@0, @1, @2), (@3, @4, @5), (@6, @7, @8)"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(9, query.Parameters.Length);
@@ -304,11 +293,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1, {user.Name} = @2", age, addressId, name)
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"UPDATE [User]",
-				"SET [User].[Age] = @0, [User].[AddressId] = @1, [User].[Name] = @2",
-			});
+				"SET [User].[Age] = @0, [User].[AddressId] = @1, [User].[Name] = @2"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(3, query.Parameters.Length);
@@ -329,12 +317,11 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"UPDATE [User]",
 				"SET [User].[Age] = @0, [User].[AddressId] = @1",
-				"WHERE ([User].[Name] LIKE '%' + @2 + '%')",
-			});
+				"WHERE ([User].[Name] LIKE '%' + @2 + '%')"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(3, query.Parameters.Length);
@@ -350,10 +337,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Delete<User>()
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
-				"DELETE FROM [User]",
-			});
+			var expectedResult = "DELETE FROM [User]";
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(0, query.Parameters.Length);
@@ -369,11 +353,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"DELETE FROM [User]",
-				"WHERE ([User].[Name] LIKE '%' + @0 + '%')",
-			});
+				"WHERE ([User].[Name] LIKE '%' + @0 + '%')"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(1, query.Parameters.Length);
@@ -392,12 +375,11 @@ namespace DefaultSqlQueryBuilder.Tests
 					name, age, addressId)
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"INSERT INTO [User] ([User].[Name], [User].[Age], [User].[AddressId])",
 				"OUTPUT INSERTED.Id",
-				"VALUES (@0, @1, @2)",
-			});
+				"VALUES (@0, @1, @2)"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, customInsertQuery.Command);
 			Assert.AreEqual(3, customInsertQuery.Parameters.Length);
@@ -414,11 +396,10 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(u => $"{u.Name}, {u}.[Age], {u.AddressId}")
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT [User].[Name], [User].[Age], [User].[AddressId]",
-				"FROM [User]",
-			});
+				"FROM [User]"
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(0, query.Parameters.Length);
@@ -438,13 +419,12 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => "*")
 				.ToSqlQuery(MsSqlSyntax);
 
-			var expectedResult = string.Join("\n", new[]
-			{
+			var expectedResult = string.Join("\n",
 				"SELECT *",
 				"FROM [User]",
 				"WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[Age] = @1))",
 				"ORDER BY [User].[Age]"
-			});
+			);
 
 			Assert.That.SqlsAreEqual(expectedResult, query.Command);
 			Assert.AreEqual(2, query.Parameters.Length);
@@ -457,7 +437,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			public int Id { get; set; }
 			public int AddressId { get; set; }
 			public int UserGroupId { get; set; }
-			public string Name { get; set; }
+			public string Name { get; set; } = "";
 			public int Age { get; set; }
 		}
 

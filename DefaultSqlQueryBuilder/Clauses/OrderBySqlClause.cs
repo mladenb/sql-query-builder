@@ -1,6 +1,8 @@
-﻿namespace DefaultSqlQueryBuilder.Clauses
+﻿using DefaultSqlQueryBuilder.Contracts;
+
+namespace DefaultSqlQueryBuilder.Clauses
 {
-	public class OrderBySqlClause : SqlClause
+	public class OrderBySqlClause : ISqlClause
 	{
 		public string Columns { get; }
 

@@ -10,11 +10,11 @@ namespace DefaultSqlQueryBuilder
 {
 	public abstract class SqlQueryBuilderBase
 	{
-		protected SqlQueryBuilderBase(ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver, IEnumerable<SqlClause>? clauses = null)
+		protected SqlQueryBuilderBase(ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver, IEnumerable<ISqlClause>? clauses = null)
 		{
 			TableNameResolver = tableNameResolver;
 			ColumnNameResolver = columnNameResolver;
-			_clauses = clauses?.ToList() ?? new List<SqlClause>();
+			_clauses = clauses?.ToList() ?? new List<ISqlClause>();
 		}
 
 		protected SqlQueryBuilderBase(SqlQueryBuilderBase sqlQueryBuilderBase)
@@ -24,9 +24,9 @@ namespace DefaultSqlQueryBuilder
 
 		public ITableNameResolver TableNameResolver { get; }
 		public IColumnNameResolver ColumnNameResolver { get; }
-		public IReadOnlyCollection<SqlClause> Clauses => _clauses.ToArray();
+		public IReadOnlyCollection<ISqlClause> Clauses => _clauses.ToArray();
 
-		private readonly List<SqlClause> _clauses;
+		private readonly List<ISqlClause> _clauses;
 
 		public SqlQuery ToSqlQuery(ISqlSyntax syntax)
 		{
@@ -115,7 +115,7 @@ namespace DefaultSqlQueryBuilder
 
 		protected void AddFirstCustom(string sql, object[] parameters)
 		{
-			_clauses.Insert(0, new CustomSqlClause(sql, parameters));
+			_clauses.Insert(0, new SqlClause(sql, parameters));
 		}
 
 		protected void AddGroupBy(string columns)
@@ -130,7 +130,7 @@ namespace DefaultSqlQueryBuilder
 
 		protected void AddCustom(string sql, object[] parameters)
 		{
-			_clauses.Add(new CustomSqlClause(sql, parameters));
+			_clauses.Add(new SqlClause(sql, parameters));
 		}
 
 		protected string ParseStringFormatExpression(Expression expression)

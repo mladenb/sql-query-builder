@@ -1,6 +1,8 @@
+using DefaultSqlQueryBuilder.Contracts;
+
 namespace DefaultSqlQueryBuilder.Clauses
 {
-	public class LeftJoinSqlClause : SqlClause
+	public class LeftJoinSqlClause : ISqlClause
 	{
 		public string TableName { get; }
 		public string OnConditions { get; }

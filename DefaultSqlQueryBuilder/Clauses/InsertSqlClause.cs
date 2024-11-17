@@ -1,6 +1,8 @@
+using DefaultSqlQueryBuilder.Contracts;
+
 namespace DefaultSqlQueryBuilder.Clauses
 {
-	public class InsertSqlClause : SqlClause
+	public class InsertSqlClause : ISqlClause
 	{
 		public string TableName { get; }
 		public string Columns { get; }
