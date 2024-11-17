@@ -1,3 +1,4 @@
+using DefaultSqlQueryBuilder.Contracts;
 using DefaultSqlQueryBuilder.Generics;
 using DefaultSqlQueryBuilder.Resolvers;
 using System;

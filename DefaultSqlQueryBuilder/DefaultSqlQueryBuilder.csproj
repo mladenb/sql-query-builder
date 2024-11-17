@@ -1,40 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>SqlQueryBuilder.NET</PackageId>
-    <Authors>Mladen B.</Authors>
-    <Company />
-    <Product>SqlQueryBuilder.Core</Product>
-    <Description>A C# library which helps create customized and extensible LINQ-like sql queries more easily.</Description>
-    <PackageReleaseNotes>Introduced SqlSyntaxes to allow for SQL syntaxes other than MSSQL.</PackageReleaseNotes>
-    <Copyright>Copyright 2024</Copyright>
-    <PackageProjectUrl>https://github.com/mladenb/sql-query-builder</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/mladenb/sql-query-builder</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>sql query builder linq</PackageTags>
-    <Version>3.0.0.0</Version>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseFile>lgpl-3.0.txt</PackageLicenseFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 
-  <ItemGroup>
-    <None Include="..\icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\lgpl-3.0.txt">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>SqlQueryBuilder.NET</PackageId>
+		<Authors>Mladen B.</Authors>
+		<Company />
+		<Product>SqlQueryBuilder.NET</Product>
+		<Description>A C# library which helps create customized and extensible LINQ-like sql queries more easily.</Description>
+		<PackageReleaseNotes>Introduced SqlSyntaxes to allow for SQL syntaxes other than MSSQL.</PackageReleaseNotes>
+		<Copyright>Copyright 2024</Copyright>
+		<PackageProjectUrl>https://github.com/mladenb/sql-query-builder</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/mladenb/sql-query-builder</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>sql query builder linq</PackageTags>
+		<Version>3.0.1.0</Version>
+		<AssemblyVersion>3.0.1.0</AssemblyVersion>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageLicenseFile>lgpl-3.0.txt</PackageLicenseFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\lgpl-3.0.txt">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>

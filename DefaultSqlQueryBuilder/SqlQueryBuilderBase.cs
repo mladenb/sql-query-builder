@@ -10,7 +10,7 @@ namespace DefaultSqlQueryBuilder
 {
 	public abstract class SqlQueryBuilderBase
 	{
-		protected SqlQueryBuilderBase(ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver, IEnumerable<SqlClause> clauses = null)
+		protected SqlQueryBuilderBase(ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver, IEnumerable<SqlClause>? clauses = null)
 		{
 			TableNameResolver = tableNameResolver;
 			ColumnNameResolver = columnNameResolver;
@@ -49,7 +49,7 @@ namespace DefaultSqlQueryBuilder
 			return TableNameResolver.Resolve(type);
 		}
 
-		protected string ColumnNameFor(Expression expression)
+		protected string? ColumnNameFor(Expression expression)
 		{
 			var memberExpression = expression.AsMemberExpression();
 			if (memberExpression == null) return null;
@@ -153,7 +153,7 @@ namespace DefaultSqlQueryBuilder
 			return string.Format(stringPattern, mappedArguments.Cast<object>().ToArray());
 		}
 
-		private static string GetSimpleString(Expression expression)
+		private static string? GetSimpleString(Expression expression)
 		{
 			if (expression.Type != typeof(string)) return null;
 

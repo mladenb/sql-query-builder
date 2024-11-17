@@ -4,7 +4,7 @@ namespace DefaultSqlQueryBuilder.Extensions
 {
 	public static class ExpressionExtensions
 	{
-		public static MemberExpression AsMemberExpression(this Expression expression)
+		public static MemberExpression? AsMemberExpression(this Expression? expression)
 		{
 			if (expression == null) return null;
 

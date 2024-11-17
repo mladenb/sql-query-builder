@@ -1,6 +1,6 @@
 using System;
 
-namespace DefaultSqlQueryBuilder
+namespace DefaultSqlQueryBuilder.Contracts
 {
 	public interface ITableNameResolver
 	{

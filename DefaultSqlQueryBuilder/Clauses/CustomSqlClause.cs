@@ -1,5 +1,3 @@
-using System;
-
 namespace DefaultSqlQueryBuilder.Clauses
 {
 	public class CustomSqlClause : SqlClause
@@ -7,10 +5,10 @@ namespace DefaultSqlQueryBuilder.Clauses
 		public string Sql { get; }
 		public object[] Parameters { get; }
 
-		public CustomSqlClause(string sql, object[] parameters = null)
+		public CustomSqlClause(string sql, params object[] parameters)
 		{
-			Sql = sql ?? throw new ArgumentNullException(nameof(sql));
-			Parameters = parameters ?? new object[0];
+			Sql = sql;
+			Parameters = parameters;
 		}
 	}
 }
