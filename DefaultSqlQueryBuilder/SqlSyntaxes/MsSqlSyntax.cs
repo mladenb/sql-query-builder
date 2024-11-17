@@ -11,48 +11,30 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 	{
 		public SqlClause ToSql(ISqlClause clause)
 		{
-			switch (clause)
+			return clause switch
 			{
-				case WhereSqlClause whereClause:
-					return new SqlClause($"WHERE ({whereClause.WhereConditions})", whereClause.Parameters);
+				WhereSqlClause whereClause => new SqlClause($"WHERE ({whereClause.WhereConditions})", whereClause.Parameters),
+				UpdateSqlClause updateClause => new SqlClause($"UPDATE {updateClause.TableName} SET {updateClause.ColumnsWithValues}", updateClause.Parameters),
+				SelectSqlClause selectClause => new SqlClause($"SELECT {selectClause.Columns}"),
+				OrderBySqlClause orderByClause => new SqlClause($"ORDER BY {orderByClause.Columns}"),
+				LeftJoinSqlClause leftJoinClause => new SqlClause($"LEFT JOIN {leftJoinClause.TableName} ON {leftJoinClause.OnConditions}", leftJoinClause.Parameters),
+				InsertSqlClause insertClause => new SqlClause($"INSERT INTO {insertClause.TableName} ({insertClause.Columns}) VALUES ({ToPlaceholdersCsv(insertClause.Parameters)})", insertClause.Parameters),
+				InsertMultipleSqlClause insertMultipleClause => CreateInsertMultiple(insertMultipleClause),
+				InnerJoinSqlClause innerJoinClause => new SqlClause($"INNER JOIN {innerJoinClause.TableName} ON {innerJoinClause.OnConditions}", innerJoinClause.Parameters),
+				GroupBySqlClause groupByClause => new SqlClause($"GROUP BY {groupByClause.Columns}"),
+				FromSqlClause fromClause => new SqlClause($"FROM {fromClause.TableName}"),
+				DeleteSqlClause deleteClause => new SqlClause($"DELETE FROM {deleteClause.TableName}"),
+				SqlClause customClause => customClause,
+				_ => throw new NotImplementedException(),
+			};
+		}
 
-				case UpdateSqlClause updateClause:
-					return new SqlClause($"UPDATE {updateClause.TableName} SET {updateClause.ColumnsWithValues}", updateClause.Parameters);
+		private SqlClause CreateInsertMultiple(InsertMultipleSqlClause insertMultipleClause)
+		{
+			var monkeys = GetInsertMultipleMonkeys(insertMultipleClause.Parameters);
+			var values = GetInsertMultipleValues(insertMultipleClause.Parameters);
 
-				case SelectSqlClause selectClause:
-					return new SqlClause($"SELECT {selectClause.Columns}");
-
-				case OrderBySqlClause orderByClause:
-					return new SqlClause($"ORDER BY {orderByClause.Columns}");
-
-				case LeftJoinSqlClause leftJoinClause:
-					return new SqlClause($"LEFT JOIN {leftJoinClause.TableName} ON {leftJoinClause.OnConditions}", leftJoinClause.Parameters);
-
-				case InsertSqlClause insertClause:
-					return new SqlClause($"INSERT INTO {insertClause.TableName} ({insertClause.Columns}) VALUES ({ToPlaceholdersCsv(insertClause.Parameters)})", insertClause.Parameters);
-
-				case InsertMultipleSqlClause insertMultipleClause:
-					var monkeys = GetInsertMultipleMonkeys(insertMultipleClause.Parameters);
-					var values = GetInsertMultipleValues(insertMultipleClause.Parameters);
-					return new SqlClause($"INSERT INTO {insertMultipleClause.TableName} ({insertMultipleClause.Columns}) VALUES {monkeys}", values);
-
-				case InnerJoinSqlClause innerJoinClause:
-					return new SqlClause($"INNER JOIN {innerJoinClause.TableName} ON {innerJoinClause.OnConditions}", innerJoinClause.Parameters);
-
-				case GroupBySqlClause groupByClause:
-					return new SqlClause($"GROUP BY {groupByClause.Columns}");
-
-				case FromSqlClause fromClause:
-					return new SqlClause($"FROM {fromClause.TableName}");
-
-				case DeleteSqlClause deleteClause:
-					return new SqlClause($"DELETE FROM {deleteClause.TableName}");
-
-				case SqlClause customClause:
-					return customClause;
-			}
-
-			throw new NotImplementedException();
+			return new SqlClause($"INSERT INTO {insertMultipleClause.TableName} ({insertMultipleClause.Columns}) VALUES {monkeys}", values);
 		}
 
 		private static object[] GetInsertMultipleValues(IEnumerable<IEnumerable<object>> parameters)
