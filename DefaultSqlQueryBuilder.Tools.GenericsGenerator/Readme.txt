@@ -15,4 +15,4 @@ How much generics to create for the file 'SqlQueryBuilder.01.cs': 10
 Done.
 ---
 
-After this, inspect the /bin/Debug/netcoreapp2.0/ folder, for the generated .cs files.
+After this, inspect the /bin/Debug/ folder, for the generated .cs files.
