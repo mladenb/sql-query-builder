@@ -8,8 +8,9 @@ namespace DefaultSqlQueryBuilder.Tests
 	[TestClass]
 	public class MsSqlQueryBuilderTests
 	{
-		private static SqlQueryBuilder CreateSqlQueryBuilder() => new SqlQueryBuilder();
-		private static MsSqlSyntax MsSqlSyntax => new();
+		private static readonly MsSqlSyntax MsSqlSyntax = new();
+
+		private static SqlQueryBuilder CreateSqlQueryBuilder() => new();
 
 		[TestMethod]
 		public void SelectWithoutWhereTest()
