@@ -11,14 +11,14 @@
 		<Company />
 		<Product>SqlQueryBuilder.NET</Product>
 		<Description>A C# library which helps create customized and extensible LINQ-like sql queries more easily.</Description>
-		<PackageReleaseNotes>Introduced SqlSyntaxes to allow for SQL syntaxes other than MSSQL.</PackageReleaseNotes>
+		<PackageReleaseNotes>Added Skip/Take clauses.</PackageReleaseNotes>
 		<Copyright>Copyright 2024</Copyright>
 		<PackageProjectUrl>https://github.com/mladenb/sql-query-builder</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/mladenb/sql-query-builder</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>sql query builder linq</PackageTags>
-		<Version>3.2.0.0</Version>
-		<AssemblyVersion>3.2.0.0</AssemblyVersion>
+		<Version>3.3.0.0</Version>
+		<AssemblyVersion>3.3.0.0</AssemblyVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

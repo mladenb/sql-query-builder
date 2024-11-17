@@ -461,6 +461,27 @@ namespace DefaultSqlQueryBuilder.Tests
 			Assert.AreEqual(age, query.Parameters.Last());
 		}
 
+		[TestMethod]
+		public void SkipTakeTest()
+		{
+			var query = CreateSqlQueryBuilder()
+				.From<User>()
+				.Select(user => "*")
+				.Skip(2)
+				.Take(3)
+				.ToSqlQuery(MsSqlSyntax);
+
+			var expectedResult = string.Join("\n",
+				"SELECT *",
+				"FROM [User]",
+				"OFFSET 2 ROWS",
+				"FETCH NEXT 3 ROWS ONLY"
+			);
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
+			Assert.AreEqual(0, query.Parameters.Length);
+		}
+
 		internal class User
 		{
 			public int Id { get; set; }

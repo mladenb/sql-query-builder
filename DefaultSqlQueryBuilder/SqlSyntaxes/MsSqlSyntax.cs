@@ -16,6 +16,8 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 				UpdateSqlClause updateClause => new SqlQuery($"UPDATE {updateClause.TableName} SET {updateClause.ColumnsWithValues}", updateClause.Parameters),
 				SelectSqlClause selectClause => new SqlQuery($"SELECT {selectClause.Columns}"),
 				OrderBySqlClause orderByClause => new SqlQuery($"ORDER BY {orderByClause.Columns}{GetOrderByDirection(orderByClause)}"),
+				SkipSqlClause skipClause => new SqlQuery($"OFFSET {skipClause.RowCount} ROWS"),
+				TakeSqlClause takeClause => new SqlQuery($"FETCH NEXT {takeClause.RowCount} ROWS ONLY"),
 				LeftJoinSqlClause leftJoinClause => new SqlQuery($"LEFT JOIN {leftJoinClause.TableName} ON {leftJoinClause.OnConditions}", leftJoinClause.Parameters),
 				InsertSqlClause insertClause => new SqlQuery($"INSERT INTO {insertClause.TableName} ({insertClause.Columns}) VALUES ({ToPlaceholdersCsv(insertClause.Parameters)})", insertClause.Parameters),
 				InsertMultipleSqlClause insertMultipleClause => CreateInsertMultiple(insertMultipleClause),

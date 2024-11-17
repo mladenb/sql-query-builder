@@ -52,6 +52,16 @@ namespace DefaultSqlQueryBuilder.Generics
 			return Update(sqlBuilder => sqlBuilder.AddOrderBy(ParseStringFormatExpression(stringExpression.Body), orderingDirection));
 		}
 
+		public SqlQueryBuilder<T1, T2, T3> Skip(uint rowCount)
+		{
+			return Update(sqlBuilder => sqlBuilder.AddSkip(rowCount));
+		}
+
+		public SqlQueryBuilder<T1, T2, T3> Take(uint rowCount)
+		{
+			return Update(sqlBuilder => sqlBuilder.AddTake(rowCount));
+		}
+
 		public SqlQueryBuilder<T1, T2, T3> Custom(Expression<Func<T1, T2, T3, string>> stringExpression, params object[] parameters)
 		{
 			return Update(sqlBuilder => sqlBuilder.AddCustom(ParseStringFormatExpression(stringExpression.Body), parameters));

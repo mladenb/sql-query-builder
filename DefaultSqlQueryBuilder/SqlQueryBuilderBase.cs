@@ -128,6 +128,16 @@ namespace DefaultSqlQueryBuilder
 			_clauses.Add(new OrderBySqlClause(columns, orderingDirection));
 		}
 
+		protected void AddSkip(uint rowCount)
+		{
+			_clauses.Add(new SkipSqlClause(rowCount));
+		}
+
+		protected void AddTake(uint rowCount)
+		{
+			_clauses.Add(new TakeSqlClause(rowCount));
+		}
+
 		protected void AddCustom(string sql, object[] parameters)
 		{
 			_clauses.Add(new CustomSqlClause(sql, parameters));
