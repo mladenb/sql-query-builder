@@ -8,6 +8,9 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 {
 	public class SQLiteSyntax : MsSqlSyntax
 	{
+		public override string EscapeTableName(string tableName) => $"\"{tableName}\"";
+		public override string EscapeColumnName(string columnName) => $"\"{columnName}\"";
+
 		public override IEnumerable<SqlQuery> ToSqlQuery(IEnumerable<ISqlClause> clauses)
 		{
 			return clauses

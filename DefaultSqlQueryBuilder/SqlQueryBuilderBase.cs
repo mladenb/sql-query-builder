@@ -10,65 +10,69 @@ namespace DefaultSqlQueryBuilder
 {
 	public class SqlQueryBuilderBase
 	{
-		protected SqlQueryBuilderBase(ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver, IEnumerable<ISqlClause>? clauses = null)
+		protected SqlQueryBuilderBase(ISqlSyntax sqlSyntax, ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver)
 		{
 			TableNameResolver = tableNameResolver;
 			ColumnNameResolver = columnNameResolver;
-			_clauses = clauses?.ToList() ?? new List<ISqlClause>();
+			SqlSyntax = sqlSyntax;
 		}
 
 		protected SqlQueryBuilderBase(SqlQueryBuilderBase sqlQueryBuilderBase)
-			: this(sqlQueryBuilderBase.TableNameResolver, sqlQueryBuilderBase.ColumnNameResolver, sqlQueryBuilderBase._clauses)
+			: this(sqlQueryBuilderBase.SqlSyntax, sqlQueryBuilderBase.TableNameResolver, sqlQueryBuilderBase.ColumnNameResolver)
 		{
+			_clauses = sqlQueryBuilderBase._clauses;
 		}
 
 		public ITableNameResolver TableNameResolver { get; }
 		public IColumnNameResolver ColumnNameResolver { get; }
+		public ISqlSyntax SqlSyntax { get; }
+
 		public IReadOnlyCollection<ISqlClause> Clauses => _clauses.ToArray();
 
-		private readonly List<ISqlClause> _clauses;
+		private readonly List<ISqlClause> _clauses = new List<ISqlClause>();
 
-		public SqlQuery ToSqlQuery(ISqlSyntax syntax)
+		public SqlQuery ToSqlQuery()
 		{
 			var consolidatedClauses = _clauses.ConsolidateWhereClauses();
-			var sqls = syntax.ToSqlQuery(consolidatedClauses);
+			var sqls = SqlSyntax.ToSqlQuery(consolidatedClauses);
 
 			var result = sqls.Aggregate((current, sql) => current.Append(sql.Sql, sql.Parameters));
 
 			return new SqlQuery(result.Sql, result.Parameters);
 		}
 
-		protected string TableNameFor<T>()
-		{
-			return TableNameFor(typeof(T));
-		}
+		protected string TableNameEscapedFor<T>() => TableNameEscapedFor(typeof(T));
 
-		protected string TableNameFor(Type type)
-		{
-			return TableNameResolver.Resolve(type);
-		}
+		protected string TableNameEscapedFor(Type type) => SqlSyntax.EscapeTableName(TableNameResolver.Resolve(type));
 
-		protected string? ColumnNameFor(Expression expression)
+		protected string? ColumnNameEscapedFor(Expression expression)
 		{
 			var memberExpression = expression.AsMemberExpression();
 			if (memberExpression == null) return null;
 
-			return ColumnNameFor(memberExpression.Expression.Type, memberExpression.Member.Name);
+			return ColumnNameEscapedFor(memberExpression.Expression.Type, memberExpression.Member.Name);
 		}
 
-		protected string ColumnNameOrTableNameFor(Expression expression)
+		private string ColumnNameEscapedFor(Type type, string memberName)
 		{
-			return ColumnNameFor(expression) ?? TableNameFor(expression.Type);
+			return SqlSyntax.EscapeTableName(TableNameResolver.Resolve(type))
+				+ "."
+				+ SqlSyntax.EscapeColumnName(ColumnNameResolver.Resolve(memberName));
+		}
+
+		protected string ColumnNameOrTableNameEscapedFor(Expression expression)
+		{
+			return ColumnNameEscapedFor(expression) ?? TableNameEscapedFor(expression.Type);
 		}
 
 		protected void AddLeftJoin<TTable>(string onConditions, object[] parameters)
 		{
-			_clauses.Add(new LeftJoinSqlClause(TableNameFor<TTable>(), onConditions, parameters));
+			_clauses.Add(new LeftJoinSqlClause(TableNameEscapedFor<TTable>(), onConditions, parameters));
 		}
 
 		protected void AddInnerJoin<TTable>(string onConditions, object[] parameters)
 		{
-			_clauses.Add(new InnerJoinSqlClause(TableNameFor<TTable>(), onConditions, parameters));
+			_clauses.Add(new InnerJoinSqlClause(TableNameEscapedFor<TTable>(), onConditions, parameters));
 		}
 
 		protected void AddWhere(string whereConditions, object[] parameters)
@@ -78,7 +82,7 @@ namespace DefaultSqlQueryBuilder
 
 		protected void AddFrom<TTable>()
 		{
-			_clauses.Add(new FromSqlClause(TableNameFor<TTable>()));
+			_clauses.Add(new FromSqlClause(TableNameEscapedFor<TTable>()));
 		}
 
 		protected void AddSelect(string columns)
@@ -91,25 +95,25 @@ namespace DefaultSqlQueryBuilder
 		{
 			_clauses.RemoveAll(clause => clause is InsertSqlClause);
 			_clauses.RemoveAll(clause => clause is InsertMultipleSqlClause);
-			_clauses.Insert(0, new InsertSqlClause(TableNameFor<TTable>(), columns, parameters));
+			_clauses.Insert(0, new InsertSqlClause(TableNameEscapedFor<TTable>(), columns, parameters));
 		}
 
 		protected void AddInsertMultiple<TTable>(string columns, object[][] parameters)
 		{
 			_clauses.RemoveAll(clause => clause is InsertSqlClause);
 			_clauses.RemoveAll(clause => clause is InsertMultipleSqlClause);
-			_clauses.Insert(0, new InsertMultipleSqlClause(TableNameFor<TTable>(), columns, parameters));
+			_clauses.Insert(0, new InsertMultipleSqlClause(TableNameEscapedFor<TTable>(), columns, parameters));
 		}
 
 		protected void AddUpdate<TTable>(string columns, object[] parameters)
 		{
 			_clauses.RemoveAll(clause => clause is UpdateSqlClause);
-			_clauses.Insert(0, new UpdateSqlClause(TableNameFor<TTable>(), columns, parameters));
+			_clauses.Insert(0, new UpdateSqlClause(TableNameEscapedFor<TTable>(), columns, parameters));
 		}
 
 		protected void AddDelete<TTable>()
 		{
-			_clauses.Add(new DeleteSqlClause(TableNameFor<TTable>()));
+			_clauses.Add(new DeleteSqlClause(TableNameEscapedFor<TTable>()));
 		}
 
 		protected void AddFirstCustom(string sql, object[] parameters)
@@ -157,7 +161,7 @@ namespace DefaultSqlQueryBuilder
 				.Arguments
 				.Skip(1)
 				.SelectMany(ToExpressionList)
-				.Select(ColumnNameOrTableNameFor);
+				.Select(ColumnNameOrTableNameEscapedFor);
 
 			return string.Format(stringPattern, mappedArguments.Cast<object>().ToArray());
 		}
@@ -200,11 +204,6 @@ namespace DefaultSqlQueryBuilder
 			return mce.Method.DeclaringType == typeof(string)
 				&& mce.Method.Name == nameof(string.Format)
 				&& mce.Arguments.First() is ConstantExpression;
-		}
-
-		private string ColumnNameFor(Type type, string memberName)
-		{
-			return ColumnNameResolver.Resolve(type, memberName);
 		}
 	}
 }

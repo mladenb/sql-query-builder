@@ -7,9 +7,7 @@ namespace DefaultSqlQueryBuilder.Tests
 	[TestClass]
 	public class SQLiteQueryBuilderTests
 	{
-		private static readonly SQLiteSyntax SqlSyntax = new();
-
-		private static SqlQueryBuilder CreateSqlQueryBuilder() => new();
+		private static SqlQueryBuilder CreateSqlQueryBuilder() => new(new SQLiteSyntax());
 
 		[TestMethod]
 		public void SkipBeforeTakeTest()
@@ -19,11 +17,11 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => "*")
 				.Skip(2)
 				.Take(3)
-				.ToSqlQuery(SqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT *",
-				"FROM [User]",
+				"FROM \"User\"",
 				"LIMIT 3",
 				"OFFSET 2"
 			);
@@ -40,11 +38,11 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => "*")
 				.Take(3)
 				.Skip(2)
-				.ToSqlQuery(SqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT *",
-				"FROM [User]",
+				"FROM \"User\"",
 				"LIMIT 3",
 				"OFFSET 2"
 			);
@@ -60,11 +58,11 @@ namespace DefaultSqlQueryBuilder.Tests
 				.From<User>()
 				.Select(user => "*")
 				.Skip(2)
-				.ToSqlQuery(SqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT *",
-				"FROM [User]",
+				"FROM \"User\"",
 				"LIMIT -1",
 				"OFFSET 2"
 			);
@@ -80,11 +78,11 @@ namespace DefaultSqlQueryBuilder.Tests
 				.From<User>()
 				.Select(user => "*")
 				.Take(3)
-				.ToSqlQuery(SqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT *",
-				"FROM [User]",
+				"FROM \"User\"",
 				"LIMIT 3"
 			);
 

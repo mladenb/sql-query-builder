@@ -10,6 +10,9 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 	{
 		public override IEnumerable<SqlQuery> ToSqlQuery(IEnumerable<ISqlClause> clauses) => clauses.Select(ToSqlQuery);
 
+		public override string EscapeTableName(string tableName) => $"[{tableName}]";
+		public override string EscapeColumnName(string columnName) => $"[{columnName}]";
+
 		protected override SqlQuery ToSqlQuery(ISqlClause clause)
 		{
 			return clause switch

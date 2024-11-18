@@ -8,11 +8,13 @@ namespace DefaultSqlQueryBuilder
 {
 	public class SqlQueryBuilder : SqlQueryBuilderBase
 	{
-		public SqlQueryBuilder() : this(new DefaultTableNameResolver(), new DefaultColumnNameResolver())
+		public SqlQueryBuilder(ISqlSyntax sqlSyntax)
+			: this(sqlSyntax, new DefaultTableNameResolver(), new DefaultColumnNameResolver())
 		{
 		}
 
-		public SqlQueryBuilder(ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver) : base(tableNameResolver, columnNameResolver)
+		public SqlQueryBuilder(ISqlSyntax sqlSyntax, ITableNameResolver tableNameResolver, IColumnNameResolver columnNameResolver)
+			: base(sqlSyntax, tableNameResolver, columnNameResolver)
 		{
 		}
 

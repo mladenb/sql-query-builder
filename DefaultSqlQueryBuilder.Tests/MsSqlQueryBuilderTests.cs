@@ -9,9 +9,7 @@ namespace DefaultSqlQueryBuilder.Tests
 	[TestClass]
 	public class MsSqlQueryBuilderTests
 	{
-		private static readonly MsSqlSyntax MsSqlSyntax = new();
-
-		private static SqlQueryBuilder CreateSqlQueryBuilder() => new();
+		private static SqlQueryBuilder CreateSqlQueryBuilder() => new(new MsSqlSyntax());
 
 		[TestMethod]
 		public void SelectWithoutWhereTest()
@@ -19,7 +17,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
 				.Select(user => "*")
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT *",
@@ -36,7 +34,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
 				.Select(user => string.Format("TOP 10 *"))
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT TOP 10 *",
@@ -53,7 +51,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
 				.Select(user => $"TOP 10 *")
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT TOP 10 *",
@@ -70,7 +68,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
 				.Select(user => $"TOP 10 {user.Age}")
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT TOP 10 [User].[Age]",
@@ -87,7 +85,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
 				.Select(user => "TOP 10 *")
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT TOP 10 *",
@@ -107,7 +105,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.From<User>()
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.Select(user => "*")
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT *",
@@ -130,7 +128,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 				.GroupBy(user => $"{user.UserGroupId}")
 				.Select(user => $"AVG({user.Age})")
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT AVG([User].[Age])",
@@ -161,7 +159,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", validUserGroupIds)
 				.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-			var query = joinQuery.ToSqlQuery(MsSqlSyntax);
+			var query = joinQuery.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT [User].[Id], [User].[Name], [User].[Age]",
@@ -194,7 +192,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", validUserGroupIds)
 				.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-			var query = joinQuery.ToSqlQuery(MsSqlSyntax);
+			var query = joinQuery.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT [User].[Id], [User].[Name], [User].[Age]",
@@ -218,7 +216,7 @@ namespace DefaultSqlQueryBuilder.Tests
 
 			var query = CreateSqlQueryBuilder()
 				.Insert<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", age, addressId, name)
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"INSERT INTO [User] ([User].[Age], [User].[AddressId], [User].[Name])",
@@ -261,7 +259,7 @@ namespace DefaultSqlQueryBuilder.Tests
 
 			var query = CreateSqlQueryBuilder()
 				.InsertMultiple<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", parameters)
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"INSERT INTO [User] ([User].[Age], [User].[AddressId], [User].[Name])",
@@ -293,7 +291,7 @@ namespace DefaultSqlQueryBuilder.Tests
 
 			var query = CreateSqlQueryBuilder()
 				.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1, {user.Name} = @2", age, addressId, name)
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"UPDATE [User]",
@@ -317,7 +315,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var query = CreateSqlQueryBuilder()
 				.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1", age, addressId)
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"UPDATE [User]",
@@ -337,7 +335,7 @@ namespace DefaultSqlQueryBuilder.Tests
 		{
 			var query = CreateSqlQueryBuilder()
 				.Delete<User>()
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = "DELETE FROM [User]";
 
@@ -353,7 +351,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var query = CreateSqlQueryBuilder()
 				.Delete<User>()
 				.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"DELETE FROM [User]",
@@ -375,7 +373,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var customInsertQuery = CreateSqlQueryBuilder()
 				.Custom<User>(u => $"INSERT INTO {u} ({u.Name}, {u.Age}, {u.AddressId}) OUTPUT INSERTED.Id VALUES (@0, @1, @2)",
 					name, age, addressId)
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"INSERT INTO [User] ([User].[Name], [User].[Age], [User].[AddressId])",
@@ -396,7 +394,7 @@ namespace DefaultSqlQueryBuilder.Tests
 			var query = CreateSqlQueryBuilder()
 				.From<User>()
 				.Select(u => $"{u.Name}, {u}.[Age], {u.AddressId}")
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT [User].[Name], [User].[Age], [User].[AddressId]",
@@ -419,7 +417,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where(user => $"{user.Age} = @0", age)
 				.OrderBy(user => $"{user.Age}")
 				.Select(user => "*")
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT *",
@@ -446,7 +444,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Where(user => $"{user.Age} = @0", age)
 				.OrderBy(user => $"{user.Age}", OrderingDirection.Descending)
 				.Select(user => "*")
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT *",
@@ -469,7 +467,7 @@ namespace DefaultSqlQueryBuilder.Tests
 				.Select(user => "*")
 				.Skip(2)
 				.Take(3)
-				.ToSqlQuery(MsSqlSyntax);
+				.ToSqlQuery();
 
 			var expectedResult = string.Join("\n",
 				"SELECT *",

@@ -16,6 +16,8 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 			};
 		}
 
+		public abstract string EscapeTableName(string tableName);
+		public abstract string EscapeColumnName(string columnName);
 		public abstract IEnumerable<SqlQuery> ToSqlQuery(IEnumerable<ISqlClause> clauses);
 	}
 }
