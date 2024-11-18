@@ -1,12 +1,13 @@
 ﻿using DefaultSqlQueryBuilder.Clauses;
 using DefaultSqlQueryBuilder.Contracts;
 using System;
+using System.Collections.Generic;
 
 namespace DefaultSqlQueryBuilder.SqlSyntaxes
 {
 	public abstract class SqlSyntaxBase : ISqlSyntax
 	{
-		public virtual SqlQuery ToSqlQuery(ISqlClause clause)
+		protected virtual SqlQuery ToSqlQuery(ISqlClause clause)
 		{
 			return clause switch
 			{
@@ -14,5 +15,7 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 				_ => throw new NotImplementedException(),
 			};
 		}
+
+		public abstract IEnumerable<SqlQuery> ToSqlQuery(IEnumerable<ISqlClause> clauses);
 	}
 }

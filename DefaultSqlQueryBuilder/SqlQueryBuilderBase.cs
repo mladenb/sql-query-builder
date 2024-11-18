@@ -30,9 +30,8 @@ namespace DefaultSqlQueryBuilder
 
 		public SqlQuery ToSqlQuery(ISqlSyntax syntax)
 		{
-			var sqls = _clauses
-				.ConsolidateWhereClauses()
-				.Select(c => syntax.ToSqlQuery(c));
+			var consolidatedClauses = _clauses.ConsolidateWhereClauses();
+			var sqls = syntax.ToSqlQuery(consolidatedClauses);
 
 			var result = sqls.Aggregate((current, sql) => current.Append(sql.Sql, sql.Parameters));
 

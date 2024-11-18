@@ -1,7 +1,9 @@
-﻿namespace DefaultSqlQueryBuilder.Contracts
+﻿using System.Collections.Generic;
+
+namespace DefaultSqlQueryBuilder.Contracts
 {
 	public interface ISqlSyntax
 	{
-		SqlQuery ToSqlQuery(ISqlClause clause);
+		IEnumerable<SqlQuery> ToSqlQuery(IEnumerable<ISqlClause> clauses);
 	}
 }

@@ -8,7 +8,9 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 {
 	public class MsSqlSyntax : SqlSyntaxBase
 	{
-		public override SqlQuery ToSqlQuery(ISqlClause clause)
+		public override IEnumerable<SqlQuery> ToSqlQuery(IEnumerable<ISqlClause> clauses) => clauses.Select(ToSqlQuery);
+
+		protected override SqlQuery ToSqlQuery(ISqlClause clause)
 		{
 			return clause switch
 			{

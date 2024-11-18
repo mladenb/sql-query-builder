@@ -33,5 +33,23 @@ namespace DefaultSqlQueryBuilder.Extensions
 
 			return new WhereSqlClause(newQuery.Sql, newQuery.Parameters);
 		}
+
+		public static IEnumerable<ISqlClause> FixSkipTakeForSqlite(this IEnumerable<ISqlClause> clauses)
+		{
+			var list = clauses.ToList();
+			if (list.Find(c => c is SkipSqlClause) == null) return list;
+
+			if (list.Find(c => c is TakeSqlClause) == null)
+			{
+				list.Insert(list.FindIndex(c => c is SkipSqlClause), new TakeSqlClause(-1));
+				return list;
+			}
+
+			var skipIndex = list.FindIndex(c => c is SkipSqlClause);
+			var takeIndex = list.FindIndex(c => c is TakeSqlClause);
+			if (skipIndex < takeIndex) (list[skipIndex], list[takeIndex]) = (list[takeIndex], list[skipIndex]); // swap
+
+			return list;
+		}
 	}
 }
