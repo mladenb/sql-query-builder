@@ -52,12 +52,12 @@ namespace DefaultSqlQueryBuilder.Generics
 			return Update(sqlBuilder => sqlBuilder.AddOrderBy(ParseStringFormatExpression(stringExpression.Body), orderingDirection));
 		}
 
-		public SqlQueryBuilder<T1, T2, T3, T4, T5, T6, T7> Skip(uint rowCount)
+		public SqlQueryBuilder<T1, T2, T3, T4, T5, T6, T7> Skip(int rowCount)
 		{
 			return Update(sqlBuilder => sqlBuilder.AddSkip(rowCount));
 		}
 
-		public SqlQueryBuilder<T1, T2, T3, T4, T5, T6, T7> Take(uint rowCount)
+		public SqlQueryBuilder<T1, T2, T3, T4, T5, T6, T7> Take(int rowCount)
 		{
 			return Update(sqlBuilder => sqlBuilder.AddTake(rowCount));
 		}

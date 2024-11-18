@@ -4,9 +4,9 @@ namespace DefaultSqlQueryBuilder.Clauses
 {
 	public class TakeSqlClause : ISqlClause
 	{
-		public uint RowCount { get; }
+		public int RowCount { get; }
 
-		public TakeSqlClause(uint rowCount)
+		public TakeSqlClause(int rowCount)
 		{
 			RowCount = rowCount;
 		}

@@ -4,9 +4,9 @@ namespace DefaultSqlQueryBuilder.Clauses
 {
 	public class SkipSqlClause : ISqlClause
 	{
-		public uint RowCount { get; }
+		public int RowCount { get; }
 
-		public SkipSqlClause(uint rowCount)
+		public SkipSqlClause(int rowCount)
 		{
 			RowCount = rowCount;
 		}
