@@ -1,8 +1,10 @@
 ﻿using DefaultSqlQueryBuilder.Clauses;
 using DefaultSqlQueryBuilder.Contracts;
 using DefaultSqlQueryBuilder.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace DefaultSqlQueryBuilder.SqlSyntaxes
 {
@@ -12,6 +14,15 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 
 		public override string EscapeTableName(string tableName) => $"[{tableName}]";
 		public override string EscapeColumnName(string columnName) => $"[{columnName}]";
+
+		private static readonly Dictionary<Type, string> SqlTypeMapping = new Dictionary<Type, string>
+		{
+			{ typeof(string), "NVARCHAR NOT NULL" },
+			{ typeof(int), "INT NOT NULL" },
+			{ typeof(int?), "INT" },
+			{ typeof(DateTime), "DATETIME2 NOT NULL" },
+			{ typeof(DateTime?), "DATETIME2" },
+		};
 
 		protected override SqlQuery ToSqlQuery(ISqlClause clause)
 		{
@@ -30,8 +41,33 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 				GroupBySqlClause groupByClause => new SqlQuery($"GROUP BY {groupByClause.Columns}"),
 				FromSqlClause fromClause => new SqlQuery($"FROM {fromClause.TableName}"),
 				DeleteSqlClause deleteClause => new SqlQuery($"DELETE FROM {deleteClause.TableName}"),
+				CreateTableIfNotExistsClause createTableClause => CreateTableIfNotExistsQuery(createTableClause),
 				_ => base.ToSqlQuery(clause),
 			};
+		}
+
+		private SqlQuery CreateTableIfNotExistsQuery(CreateTableIfNotExistsClause clause)
+		{
+			var sql = string.Join("\n",
+				$"IF OBJECT_ID(N'{clause.TableName}', N'U') IS NULL",
+				"BEGIN",
+				$"CREATE TABLE {EscapeTableName(clause.TableName)}",
+				"(",
+				string.Join(", ", clause.Columns.Select(GetCreateTableColumn)),
+				");",
+				"END;"
+			);
+
+			return new SqlQuery(sql);
+		}
+
+		private string GetCreateTableColumn(KeyValuePair<string, PropertyInfo> col)
+		{
+			var name = col.Key;
+			var type = col.Value.PropertyType;
+			if (!SqlTypeMapping.ContainsKey(type)) throw new NotImplementedException();
+
+			return $"{name} {SqlTypeMapping[type]}";
 		}
 
 		private string GetOrderByDirection(OrderBySqlClause clause)

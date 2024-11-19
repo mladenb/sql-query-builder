@@ -22,6 +22,14 @@ namespace DefaultSqlQueryBuilder
 		{
 		}
 
+		public SqlQueryBuilder CreateTableIfNotExists<TTable>()
+		{
+			var clone = Clone();
+			clone.AddCreateTableIfNotExists<TTable>();
+
+			return clone;
+		}
+
 		public SqlQueryBuilder<TTable> From<TTable>()
 		{
 			return UpdateAndExpand<TTable>(sqlBuilder => sqlBuilder.AddFrom<TTable>());

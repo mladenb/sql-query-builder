@@ -2,6 +2,7 @@ using DefaultSqlQueryBuilder.Contracts;
 using DefaultSqlQueryBuilder.SqlSyntaxes;
 using DefaultSqlQueryBuilder.Tests.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Linq;
 
 namespace DefaultSqlQueryBuilder.Tests
@@ -480,6 +481,34 @@ namespace DefaultSqlQueryBuilder.Tests
 			Assert.AreEqual(0, query.Parameters.Length);
 		}
 
+		[TestMethod]
+		public void CreateTablesIfNotExistTest()
+		{
+			var query = CreateSqlQueryBuilder()
+				.CreateTableIfNotExists<User>()
+				.ToSqlQuery();
+
+			var expectedResult = string.Join("\n",
+				"IF OBJECT_ID(N'User', N'U') IS NULL",
+				"BEGIN",
+				"CREATE TABLE [User]",
+				"(",
+				"Id INT NOT NULL,",
+				"AddressId INT NOT NULL,",
+				"UserGroupId INT NOT NULL,",
+				"Name NVARCHAR NOT NULL,",
+				"Age INT NOT NULL,",
+				"NullableAge INT,",
+				"Date1 DATETIME2 NOT NULL,",
+				"Date2 DATETIME2",
+				");",
+				"END;"
+			);
+
+			Assert.That.SqlsAreEqual(expectedResult, query.Sql);
+			Assert.AreEqual(0, query.Parameters.Length);
+		}
+
 		internal class User
 		{
 			public int Id { get; set; }
@@ -487,6 +516,9 @@ namespace DefaultSqlQueryBuilder.Tests
 			public int UserGroupId { get; set; }
 			public string Name { get; set; } = "";
 			public int Age { get; set; }
+			public int? NullableAge { get; set; }
+			public DateTime Date1 { get; set; }
+			public DateTime? Date2 { get; set; }
 		}
 
 		internal class Address

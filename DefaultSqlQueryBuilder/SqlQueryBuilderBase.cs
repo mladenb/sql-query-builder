@@ -91,6 +91,18 @@ namespace DefaultSqlQueryBuilder
 			_clauses.Insert(0, new SelectSqlClause(columns));
 		}
 
+		protected void AddCreateTableIfNotExists<TTable>()
+		{
+			var tableType = typeof(TTable);
+			var tableName = TableNameResolver.Resolve(tableType);
+			var columns = tableType
+				.GetProperties()
+				.ToDictionary(p => ColumnNameResolver.Resolve(p.Name), p => p);
+
+			_clauses.Clear();
+			_clauses.Insert(0, new CreateTableIfNotExistsClause(tableName, columns));
+		}
+
 		protected void AddInsert<TTable>(string columns, object[] parameters)
 		{
 			_clauses.RemoveAll(clause => clause is InsertSqlClause);
