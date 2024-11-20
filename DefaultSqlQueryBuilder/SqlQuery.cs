@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace DefaultSqlQueryBuilder
@@ -7,6 +8,11 @@ namespace DefaultSqlQueryBuilder
 	{
 		public string Sql { get; }
 		public object[] Parameters { get; }
+
+		public IReadOnlyDictionary<string, object> NamedParameters =>
+			Parameters
+				.Select((o, i) => KeyValuePair.Create($"@{i}", o))
+				.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
 		public SqlQuery(string sql, params object[] parameters)
 		{

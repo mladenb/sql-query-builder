@@ -22,6 +22,8 @@ namespace DefaultSqlQueryBuilder.SqlSyntaxes
 			{ typeof(int?), "INT" },
 			{ typeof(DateTime), "DATETIME2 NOT NULL" },
 			{ typeof(DateTime?), "DATETIME2" },
+			{ typeof(double), "FLOAT NOT NULL" },
+			{ typeof(double?), "FLOAT" },
 		};
 
 		protected override SqlQuery ToSqlQuery(ISqlClause clause)
