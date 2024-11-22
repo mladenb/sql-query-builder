@@ -1,5 +1,5 @@
 # SqlQueryBuilder.NET
-A C# library which helps create extensible LINQ-like sql queries.
+A C# library which helps create extensible LINQ-like sql queries ([Nuget package](https://www.nuget.org/packages/SqlQueryBuilder.NET)).
 
 ## Quick Start
 
