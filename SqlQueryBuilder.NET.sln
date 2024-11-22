@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35506.116 d17.12
+VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefaultSqlQueryBuilder", "DefaultSqlQueryBuilder\DefaultSqlQueryBuilder.csproj", "{07965689-F6EB-46F3-8F02-911ED15A11A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlQueryBuilders", "SqlQueryBuilders\SqlQueryBuilders.csproj", "{07965689-F6EB-46F3-8F02-911ED15A11A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefaultSqlQueryBuilder.Tools.GenericsGenerator", "DefaultSqlQueryBuilder.Tools.GenericsGenerator\DefaultSqlQueryBuilder.Tools.GenericsGenerator.csproj", "{76B9EC61-968A-4A0D-868A-376ADBBC6E5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlQueryBuilders.Tools.GenericsGenerator", "SqlQueryBuilders.Tools.GenericsGenerator\SqlQueryBuilders.Tools.GenericsGenerator.csproj", "{76B9EC61-968A-4A0D-868A-376ADBBC6E5E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefaultSqlQueryBuilder.Tests", "DefaultSqlQueryBuilder.Tests\DefaultSqlQueryBuilder.Tests.csproj", "{DECB2AA8-514F-4AD8-90F3-F9606743983B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlQueryBuilders.Tests", "SqlQueryBuilders.Tests\SqlQueryBuilders.Tests.csproj", "{DECB2AA8-514F-4AD8-90F3-F9606743983B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

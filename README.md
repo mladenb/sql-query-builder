@@ -1,112 +1,182 @@
-# sql-query-builder
-A C# library which helps create customized and extensible LINQ-like sql queries more easily.
+# SqlQueryBuilder.NET
+A C# library which helps create extensible LINQ-like sql queries.
+
+## Quick Start
+
+```csharp
+var builder = new SqlQueryBuilder(new MsSqlSyntax());
+// you can implement a custom ISqlSyntax or use an already implemented MsSqlSyntax
+
+var query = builder
+	.From<Booking>()
+	// .SelectAll() // also take a look at the bottom of this composition
+	.InnerJoin<Client>((booking, client) => $"{booking.ClientId} = {client.Id}")
+	.InnerJoin<Room>((booking, client, room) => $"{booking.RoomId} = {room.Id}")
+	.Where((booking, client, room) => $"{booking.Date} >= @0 AND {booking.Date} <= @1", filter.DateFrom, filter.DateTo)
+	.Where((booking, client, room) => $"{booking.Price} >= @0 AND {booking.Price} <= @1", filter.PriceFrom, filter.PriceTo)
+	.Where((booking, client, room) => $"{booking.ClientId} == @0", filter.ClientId)
+	.Where((booking, client, room) => $"{booking.RoomId} == @0", filter.RoomId)
+	.Select((booking, client, room) => $"{booking.Id}, {room.Name}, {client.Name}, {booking.Date}, {booking.Price}")
+	// or .SelectAll()
+	.ToSqlQuery();
+
+public class Booking
+{
+	public int Id { get; set; }
+	public int ClientId { get; set; }
+	public int RoomId { get; set; }
+	public DateTime Date { get; set; }
+	public double Price { get; set; }
+}
+public class Client
+{
+	public int Id { get; set; }
+	public string Name { get; set; }
+}
+public class Room
+{
+	public int Id { get; set; }
+	public string Name { get; set; }
+}
+```
+
+`query.Sql` will be a string with the following value:
+```sql
+SELECT [Bookings].[Id], [Rooms].[Name], [Clients].[Name], [Bookings].[Date], [Bookings].[Price]
+FROM [Bookings]
+INNER JOIN [Clients] ON [Bookings].[ClientId] = [Clients].[Id]
+INNER JOIN [Rooms] ON [Bookings].[RoomId] = [Rooms].[Id]
+WHERE (((([Bookings].[Date] >= @0 AND [Bookings].[Date] <= @1) AND ([Bookings].[Price] >= @2 AND [Bookings].[Price] <= @3)) AND ([Bookings].[ClientId] == @4)) AND ([Bookings].[RoomId] == @5))
+```
+
+`query.Parameters` will be an array of objects:
+```
+[0]: filter.DateFrom,
+[1]: filter.DateTo,
+[2]: filter.PriceFrom,
+[3]: filter.PriceTo,
+[4]: filter.ClientId,
+[5]: filter.RoomId,
+```
+
+`query.NamedParameters` will be a dictionary:
+```
+{ "@0", filter.DateFrom },
+{ "@1", filter.DateTo },
+{ "@2", filter.PriceFrom },
+{ "@3", filter.PriceTo },
+{ "@4", filter.ClientId },
+{ "@5", filter.RoomId },
+```
+
+You can now use the `query` object for example to create an `IDbCommand`:
+```csharp
+public static IDbCommand CreateCommandFrom(this IDbConnection connection, SqlQuery sqlQuery)
+{
+	var cmd = connection.CreateCommand();
+	cmd.CommandText = sqlQuery.Sql;
+	foreach (var (name, value) in sqlQuery.NamedParameters)
+		cmd.Parameters[name] = value;
+
+	return cmd;
+}
+```
+and call the [`ExecuteReader()`](https://learn.microsoft.com/en-us/dotnet/api/system.data.idbcommand.executereader?view=net-9.0#system-data-idbcommand-executereader) method from `System.Data.IDbCommand`.
+
 
 ## Introduction
 
-Each time we need to create a data layer for an ASP.NET Core application, which is backed up by an SQL database,
-we're faced with a question how to design our SQL queries, to make them easy to use, maintain and extend.
-Of course, it's fairly easy to just [implement SQL queries in ASP.NET](https://msdn.microsoft.com/en-us/library/fksx3b4f.aspx).
-But, once implemented, the process of extending and maintaining those queries can quickly become difficult, especially if we
-implement those queries as simple string constants, which opens the door to [SQL injections](https://en.wikipedia.org/wiki/SQL_injection).
+This library makes designing a data layer of an ASP.NET application, backed by an SQL database, easier in cases we need to write things from scratch instead of using an ORM solution.
 
-What we would like to implement, ideally, is something that is:
-- easy to maintain (which means we can easily add/delete/update/rename tables/columns)
-- easy to extend (which means we can quickly create new SQL queries on top of existing ones)
-- immune to security threats (like SQL injections)
+As an example, take a look at [manually executing SQL queries using ADO.NET and C#](https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/ado-net-code-examples).
 
-Many of us usually decide to use an [object-relational mapping (ORM) solution](https://en.wikipedia.org/wiki/List_of_object-relational_mapping_software),
-like [EntityFramework](https://en.wikipedia.org/wiki/Entity_Framework),
-[NPoco](https://github.com/schotime/NPoco), [LINQ to SQL](https://en.wikipedia.org/wiki/LINQ_to_SQL)
-or similar, to deal with the data layer as a whole.
-This approach is pretty much a standard these days and this article does not
-offer an alternative to those solutions, but rather tries to make things even easier.
+But, the process of maintaining and extending those SQL queries can quickly become tedious due to the nature of the hard coded SQL statements as strings.
 
-Note that SQL query builder, described in this article, is a standalone solution,
-without any dependency, and it is NOT a requirement to have an ORM solution
-in order to use it.
+What we need, ideally, is something that is:
+- easy to maintain (we can easily add/delete/update/rename tables/columns)
+- easy to extend (we can create new SQL queries on top of existing ones quickly)
+- immune to SQL injections (I hope, in the 21st century, this should really go without saying)
+
+## IMPORTANT NOTE
+
+Many of us will probably find it easier to use an [object-relational mapping (ORM) solution](https://en.wikipedia.org/wiki/List_of_object-relational_mapping_software), like [EntityFramework](https://en.wikipedia.org/wiki/Entity_Framework), [NPoco](https://github.com/schotime/NPoco), [LINQ to SQL](https://en.wikipedia.org/wiki/LINQ_to_SQL) or similar, to deal with the data layer as a whole. This approach is a recommended one and pretty much the standard these days, and this library does not offer an alternative to these solutions, but rather deals with the cases when we're forced to do things from the ground up, for some reason.
 
 ## What is SQL query builder
 
-Working on a web API project recently, I had an idea to create a small library,
-which could help us create SQL queries that are maintainable, reusable and easy to use.
-Part of the inspiration for this library was the [.NET's Language Integrated Query facility (LINQ)](https://msdn.microsoft.com/en-us/library/bb308959.aspx)
-and the elegance with which LINQ queries were extended.
+SQL query builder is a lightweight library, without any dependencies besides the framework itself, and there's no requirement to have an ORM solution in order to use it.
 
-The idea was to create reusable SQL queries and build any new queries on top of the existing ones.
-Ideally, we should be able to create a basic query, like `SELECT * FROM [Table]`
-and build any new queries on top of that basic query, just by extending it, just like
-in a LINQ query, where we start from an enumeration and keep extending the query
-until we shape it into what we need. For example:
+Part of the inspiration for this library was the [.NET's Language Integrated Query facility (LINQ)](https://msdn.microsoft.com/en-us/library/bb308959.aspx) and the elegance with which LINQ queries were used. Similarly, the idea for this library was to design reusable SQL queries that are easy to extend and build new queries on top of the existing ones. Just like the `IEnumerable<T>` interface in LINQ, there is an `SqlQueryBuilder` class which behaves in a similar way. It allows us to build our SQL queries in the similar fashion like LINQ compositions in order to finally materialize the IEnumerable/SqlQueryBuilder into something we can use.
+
+Ideally, we should be able to create a basic query, like `SELECT * FROM [Table]` and build any new queries on top of that basic query, just by extending it, just like in a LINQ query, where we start from an enumeration and keep extending it until we finally materialize it into something concrete. For example:
 
 ```csharp
 IEnumerable<User> allUsers = GetAll<User>();
 
-var activeGroups = allUsers
-                      .Where(user => user.IsActive)
-                      .Select(user => user.Id)
-                      .Distinct()
-                      .ToArray();
+var activeUserIds = allUsers
+	.Where(user => user.IsActive)
+	.Select(user => user.Id)
+	.Distinct()
+	.ToArray();
+
+var inactiveUserNames = allUsers
+	.Where(user => !user.IsActive)
+	.DistinctBy(user => user.Id)
+	.Select(user => user.Name)
+	.ToArray();
 ```
 
-We start with an enumeration of all users, using `GetAll<User>()`, which we can
-reuse as many times as we need. Then we extend our query by adding a filter
-(`Where()`), mapping the result to the list of user ids (`Select()`), reducing
-the result further to the distinct enumeration of user ids. After we crafted our
-query, we materialize it with `ToArray()`.
+We start with an enumeration of all users, using `GetAll<User>()`, which we can reuse, to compose more complex queries. We, then, extend our query by adding a filter (`Where()`), mapping the result to the list of user ids (`Select()`), reducing the result further to distinct user ids. After we crafted our query, we materialize it with `ToArray()`. We also reuse the initial enumeration to create another collection of inactive user names in a similar fashion.
 
-The SQL query builder implements the similar behavior, helping us to create our
-queries in a similar fashion as LINQ queries, materializing them in the end as
-simple `SqlQuery` objects which consist of a string (the actual SQL command) and an object
-array (the SQL parameters):
+The SQL query builder implements the similar behavior, helping us to create reusable queries in a similar fashion as LINQ queries, materializing them in the end as simple `SqlQuery` objects which consist of a string (the actual SQL command) and an array of query parameters:
 
 ```csharp
 public class SqlQuery
 {
-	public string Command { get; }
+	public string Sql { get; }
 	public object[] Parameters { get; }
+	public IReadOnlyDictionary<string, object> NamedParameters { get; }
 }
 ```
 
-That approach helps us create [parameterized SQL queries](https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqlcommand.parameters(v=vs.110).aspx)
-to avoid being a victim of an SQL injection attack.
+That approach helps us create [parameterized SQL queries](https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqlcommand.parameters(v=vs.110).aspx) to avoid being a victim of an SQL injection attack, obviously.
 
 ## Usage
 
-Let's take a look at some examples, which would explain it better, hopefully. First, we create an SqlQueryBuilder:
+Let's take a look at some examples, which would explain it better, hopefully. First, we create an `SqlQueryBuilder` instace providing a specific `ISqlSyntax` to be used when composing our queries:
 
 ```csharp
-var builder = new SqlQueryBuilder();
+var builder = new SqlQueryBuilder(new MsSqlSyntax());
 ```
 
 which we'll use in all the following examples. For example, let's select everything from a table `User`:
 
 ```csharp
-var query = builder
+var allUsersQueryBuilder = builder
 	.From<User>()
 	.SelectAll();
 
-var sql = query.ToSqlQuery();
+var sqlQuery = allUsersQueryBuilder.ToSqlQuery();
 ```
 
-In our `sql` variable, we'll have an SqlQuery object, with the Command property set to:
+In our `sqlQuery` variable, we'll have an `SqlQuery` instance, with the `Sql` property set to:
 
 ```sql
 SELECT *
 FROM [User]
 ```
 
-And if we extend that query, by adding a filter to our result set, using a `WHERE` clause:
+with empty `Parameters` array. And if we extend the `allUsersQueryBuilder`, by adding a `WHERE` filter:
 
 ```csharp
 var name = "John";
 
-var newQuery = query
+var newQueryBuilder = allUsersQueryBuilder
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name);
 
-var newSql = newQuery.ToSqlQuery();
+var newSqlQuery = newQuery.ToSqlQuery();
 ```
 
-that will create an SqlQuery, with the Command property:
+we'll get the `newSqlQuery` instance, with the `Sql` property set to:
 
 ```sql
 SELECT *
@@ -114,28 +184,19 @@ FROM [User]
 WHERE ([User].[Name] LIKE '%' + @0 + '%')
 ```
 
-and its Parameters property:
+and `Parameters` property, which is an array of objects containing:
 
 ```sql
-@0 = "John"
+[0]: "John"
 ```
 
-Note that we made use of the [String.Format()](https://msdn.microsoft.com/en-us/library/system.string.format(v=vs.110).aspx)
-method in order to leverage the help of [IntelliSense](https://docs.microsoft.com/en-us/visualstudio/ide/using-intellisense),
-to help us write queries more conveniently. We also used the "[string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated)"
-feature of the C# language, to make things even easier.
+Note that we've made use of the [String.Format()](https://msdn.microsoft.com/en-us/library/system.string.format%28v=vs.110%29.aspx) method in order to leverage the help of [IntelliSense](https://docs.microsoft.com/en-us/visualstudio/ide/using-intellisense), to help us write queries more conveniently. We've also used the "[string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated)" feature of the C# language, to make things even easier.
 
 The string `$"{user.Name} LIKE '%' + @0 + '%'"` is the same as `string.Format("{0} LIKE '%' + @0 + '%'", user.Name)`.
 
-The SqlQueryBuilder will parse this construct and enumerate all the classes and
-properties used and will map them to the appropriate tables/columns of the
-underlying SQL database. The default convention is to use the same naming for the
-C# classes and SQL tables, as well as the same naming for the C# properties on
-those classes and SQL columns of those tables. We can, of course, customize this
-mapping by providing our own mapper implementations (see section "Custom table/column names mapping").
+The `SqlQueryBuilder` will parse this construct and enumerate all the classes and properties used and will map them to the appropriate tables/columns of the underlying SQL database. The default convention is to use the same naming for the C# classes and SQL tables, as well as the same naming for the C# properties on those classes and SQL columns of those tables. We can, of course, customize this mapping by providing our own mapper implementations for `ITableNameResolver` and `IColumnNameResolver` (see section "Custom table/column names mapping").
 
-Once we have our query built, we can use it, for example, directly using
-[`System.Data.SqlClient.SqlConnection`](https://github.com/dotnet/corefx/blob/master/src/System.Data.SqlClient/src/System/Data/SqlClient/SqlConnection.cs), like this:
+Once we have our query built, we can use it, for example, directly using `Microsoft.Data.SqlClient.SqlConnection`, like this:
 
 ```csharp
 using (var connection = new SqlConnection(ConnectionString))
@@ -147,18 +208,22 @@ using (var connection = new SqlConnection(ConnectionString))
 	param.ParameterName = "@0";
 	param.Value = query.Parameters[0];
 
+	cmd.Parameters.Add(param);
+
+	// or using SqlQuery.NamedParameters
+	foreach (var (name, value) in sqlQuery.NamedParameters)
+		cmd.Parameters[name] = value;
+
 	connection.Open();
 	...
 }
 ```
 
-Of course, this is just a basic example how can we use the query that SqlQueryBuilder
-has generated for us. But we can also use our favorite ORM solution instead.
+This is just a basic example how to use the `SqlQuery` that `SqlQueryBuilder` has generated for us. But we can also use our favorite ORM solution instead.
 
 ## Reusing queries
 
-If we want to create a simple SQL query and reuse it to construct more complex new queries,
-we could do it easily, writing something like this:
+If we want to create a simple SQL query and reuse it to construct more complex new queries, we could do it easily, writing something like this:
 
 ```csharp
 var name = "John";
@@ -177,11 +242,11 @@ var usersByNameExtendedQuery = usersByNameQuery
 	.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", userGroupIds)
 	.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-var usersByNameSql = usersByNameQuery.ToSqlQuery();
-var usersByNameExtendedSql = usersByNameExtendedQuery.ToSqlQuery();
+var usersByNameSqlQuery = usersByNameQuery.ToSqlQuery();
+var usersByNameExtendedSqlQuery = usersByNameExtendedQuery.ToSqlQuery();
 ```
 
-we would end up with 2 SqlQuery objects. The first one, `usersByNameSql`, would have a Command:
+we would end up with 2 `SqlQuery` objects. The first one, `usersByNameSqlQuery`, would have a `Sql` property of:
 
 ```sql
 SELECT *
@@ -189,13 +254,13 @@ FROM [User]
 WHERE ([User].[Name] LIKE '%' + @0 + '%')
 ```
 
-and its Parameters set to:
+and its `Parameters` set to:
 
 ```sql
-@0 = "John"
+[0]: "John"
 ```
 
-The second SqlQuery, `usersByNameExtendedSql`, would have Command/Parameters properties set to:
+The second one, `usersByNameExtendedSqlQuery`, would have `Sql/Parameters` properties set to:
 
 ```sql
 SELECT [User].[Id], [User].[Name], [User].[Age]
@@ -205,18 +270,18 @@ INNER JOIN [UserGroup] ON [User].[UserGroupId] = [UserGroup].[Id]
 WHERE (([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] IN (@1,@2,@3)))
 ```
 ```sql
-@0 = "John"
-@1 = 1
-@2 = 2
-@3 = 3
+[0]: "John"
+[1]: 1
+[2]: 2
+[3]: 3
 ```
 
-Note that, in the `usersByNameExtendedSql`, the first "`SELECT *`" got replaced with the second
-"`SELECT [User].[Id]...`", and all the `WHERE` clauses got merged.
+Note that, in the `usersByNameExtendedSqlQuery`, the first "`SELECT *`" got replaced with the second
+"`SELECT [User].[Id]...`", and all the `WHERE` clauses got merged together automatically.
 
 ## A couple of more complex queries
 
-We can create even more complex queries, expanding the list of joined tables with multiple `WHERE` statements, later combined into one:
+We can create some more complex queries, expanding the list of joined tables with multiple `WHERE` statements, later combined into one:
 
 ```csharp
 var name = "John";
@@ -234,12 +299,11 @@ var joinQuery = baseQuery
 	.Where((user, address, userGroup) => $"{user.UserGroupId} IN (@0)", userGroupIds)
 	.Select((user, address, userGroup) => $"{user.Id}, {user.Name}, {user.Age}");
 
-var baseSql = baseQuery.ToSqlQuery();
-var joinSql = joinQuery.ToSqlQuery();
+var baseSqlQuery = baseQuery.ToSqlQuery();
+var joinSqlQuery = joinQuery.ToSqlQuery();
 ```
 
-which would result in 2 SqlQuery objects.
-The first one, `baseSql` would have the Command/Parameters properties like:
+which would result in 2 `SqlQuery` objects. The first one, `baseSqlQuery` would have the `Sql/Parameters` properties like this:
 
 ```sql
 SELECT *
@@ -247,10 +311,10 @@ FROM [User]
 WHERE ([User].[Name] LIKE '%' + @0 + '%')
 ```
 ```sql
-@0 = "John"
+[0]: "John"
 ```
 
-and the second query, `joinSql`, would look like:
+and the second one, `joinSqlQuery`, would look like this:
 
 ```sql
 SELECT [User].[Id], [User].[Name], [User].[Age]
@@ -260,39 +324,39 @@ INNER JOIN [UserGroup] ON [User].[UserGroupId] = [UserGroup].[Id]
 WHERE ((([User].[Name] LIKE '%' + @0 + '%') AND ([User].[UserGroupId] = 1)) AND ([User].[UserGroupId] IN (@1,@2,@3)))
 ```
 ```sql
-@0 = "John"
-@1 = 1
-@2 = 2
-@3 = 3
+[0]: "John"
+[1]: 1
+[2]: 2
+[3]: 3
 ```
 
-## INSERT / UPDATE made easy
+## INSERT / UPDATE
 
-In order to create an `INSERT` SQL statement, it is just enough to write something like this:
+In order to create an `INSERT` SQL statement, it is enough to write something like this:
 
 ```csharp
 var age = 10;
 var addressId = 1;
 var name = "John";
 
-var insertSql = builder
+var insertSqlQuery = builder
 	.Insert<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", age, addressId, name)
 	.ToSqlQuery();
 ```
 
-which would produce this SqlQuery as a result:
+which would produce this `SqlQuery` as a result:
 
 ```sql
 INSERT INTO [User] ([User].[Age], [User].[AddressId], [User].[Name])
 VALUES (@0, @1, @2)
 ```
 ```sql
-@0 = 10
-@1 = 1
-@2 = "John"
+[0]: 10
+[1]: 1
+[2]: "John"
 ```
 
-In order to create an `INSERT` SQL statement with multiple rows of data at once, we would write:
+In order to create an `INSERT` SQL statement with multiple rows of data at once, we could write:
 
 ```csharp
 var users = new[]
@@ -306,27 +370,27 @@ var parameters = users
 	.Select(u => new object[] { u.Age, u.AddressId, u.Name })
 	.ToArray();
 
-var insertMultipleSql = builder
+var insertMultipleSqlQuery = builder
 	.InsertMultiple<User>(user => $"{user.Age}, {user.AddressId}, {user.Name}", parameters)
 	.ToSqlQuery();
 ```
 
-which would create an SqlQuery like this:
+which would create an `SqlQuery` instance like this one:
 
 ```sql
 INSERT INTO [User] ([User].[Age], [User].[AddressId], [User].[Name])
 VALUES (@0, @1, @2), (@3, @4, @5), (@6, @7, @8)
 ```
 ```sql
-@0 = 10
-@1 = 1
-@2 = "John"
-@3 = 20
-@4 = 2
-@5 = "Jane"
-@6 = 30
-@7 = 3
-@8 = "Smith"
+[0]: 10
+[1]: 1
+[2]: "John"
+[3]: 20
+[4]: 2
+[5]: "Jane"
+[6]: 30
+[7]: 3
+[8]: "Smith"
 ```
 
 For the `UPDATE` statement, it's quite similar:
@@ -336,13 +400,13 @@ var age = 10;
 var addressId = 1;
 var name = "John";
 
-var updateByNameSql = builder
+var updateByNameSqlQuery = builder
 	.Update<User>(user => $"{user.Age} = @0, {user.AddressId} = @1", age, addressId)
 	.Where(user => $"{user.Name} LIKE '%' + @0 + '%'", name)
 	.ToSqlQuery();
 ```
 
-and the result would be as expected:
+and the result would be:
 
 ```sql
 UPDATE [User]
@@ -350,23 +414,36 @@ SET [User].[Age] = @0, [User].[AddressId] = @1
 WHERE ([User].[Name] LIKE '%' + @2 + '%')
 ```
 ```sql
-@0 = 10
-@1 = 1
-@2 = "John"
+[0]: 10
+[1]: 1
+[2]: "John"
 ```
 
-Note that we don't have to keep track of the last parameter index used in previous
-statements/clauses, because each new statement/clause will start enumerating its
-parameters from a zero-based index.
-
-That's why, in the previous query in the `Where()` method, we didn't use the index "`@2`"
-for the user's name placeholder, but we rather used the parameter with index "`@0`".
+Note that we don't have to keep track of the last parameter index used in a previous statement/clause, because each new statement/clause will start enumerating its parameters from a zero-based index. That's why, in the previous query in the `Where()` method, we didn't use the index "`@2`" for the user's `Name`, but rather used the parameter with index "`@0`".
 
 ## Custom table/column names mapping
 
-If we have a scenario where our table/column names are not exactly "one-to-one" mapped to our classes/properties, we can specify our custom table/column mappers, when creating a new instance of an SqlQueryBuilder.
+If we have a scenario where our table/column names are not exactly "one-to-one" mapped to our classes/properties, we can specify our custom table/column mappers, when creating a new instance of an `SqlQueryBuilder`.
 
-For example, if we create our `ITableNameResolver` like this:
+For example, a simple custom `ITableNameResolver` could map the class name written in singular to table names defined in plural, like this:
+
+```csharp
+public class PluralTableNameResolver : ITableNameResolver
+{
+	public string Resolve(Type type)
+	{
+		return type switch
+		{
+			_ when type == typeof(Booking) => "Bookings",
+			_ when type == typeof(Client) => "Clients",
+			_ when type == typeof(Room) => "Rooms",
+			_ => throw new NotImplementedException()
+		};
+	}
+}
+```
+
+For those of us, who like [NPoco](https://github.com/schotime/NPoco), we can create our `ITableNameResolver` like this:
 ```csharp
 public class NPocoTableNameResolver : ITableNameResolver
 {
@@ -381,13 +458,11 @@ public class NPocoTableNameResolver : ITableNameResolver
 	{
 		if (type == null) throw new ArgumentNullException(nameof(type));
 
-		var tableName = _database
+		return _database
 			.PocoDataFactory
 			.ForType(type)
 			.TableInfo
 			.TableName;
-
-		return $"[{tableName}]";
 	}
 }
 ```
@@ -409,22 +484,23 @@ public class NPocoColumnNameResolver : IColumnNameResolver
 
 		var data = _database.PocoDataFactory.ForType(type);
 		var tableName = data.TableInfo.TableName;
-		var columnName = data
+
+		return data
 			.Members
 			.First(x => x.Name == memberName)
 			.PocoColumn
 			.ColumnName;
-
-		return $"[{tableName}].[{columnName}]";
 	}
 }
 ```
-then we can make use of the [NPoco's mapping feature](https://github.com/schotime/NPoco/wiki/Mapping) and have even more customized SQL strings. We just need to create an instance of an SqlQueryBuilder like this:
+then we can make use of the [NPoco's mapping feature](https://github.com/schotime/NPoco/wiki/Mapping). We could create an instance of an `SqlQueryBuilder` like this:
 ```csharp
 var db = new NPoco.Database("connectionString");
 var tableNameResolver = new NPocoTableNameResolver(db);
 var columnNameResolver = new NPocoColumnNameResolver(db);
+var sqlSyntax = new MsSqlSyntax();
 
-var builder = new SqlQueryBuilder(tableNameResolver, columnNameResolver);
+var builder = new SqlQueryBuilder(sqlSyntax, tableNameResolver, columnNameResolver);
 ```
-and we can reuse all the examples given here, in this document, the same way.
+and we could reuse all the examples given above.
+
